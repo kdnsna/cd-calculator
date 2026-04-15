@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0288d1">
+    <title>3年期大额存单转让计算器</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 16px;
+            padding-bottom: 40px;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 24px 0 20px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            letter-spacing: 1px;
+        }
+
+        .header .subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-top: 6px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed #e0e0e0;
+        }
+
+        .card-header .icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .input-card .card-header .icon {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .output-card .card-header .icon {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .card-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            padding-right: 50px;
+            border: 2px solid #e8e8e8;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        input:focus {
+            border-color: #0288d1;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(2, 136, 209, 0.1);
+        }
+
+        input.error {
+            border-color: #e74c3c;
+            background: #fff5f5;
+        }
+
+        .unit {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        .tips {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+            padding-left: 4px;
+        }
+
+        .calc-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .calc-btn:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .calc-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .calc-btn:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .result-item {
+            background: linear-gradient(135deg, #fff9f0 0%, #fff5e6 100%);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #ffe4c4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #e65100;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+
+        .result-value.empty {
+            color: #bbb;
+            font-size: 16px;
+        }
+
+        .copy-btn {
+            margin-top: 16px;
+            width: 100%;
+            padding: 12px;
+            background: #f5f5f5;
+            border: 1px dashed #ddd;
+            border-radius: 10px;
+            color: #666;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:active {
+            background: #e8e8e8;
+        }
+
+        .copy-btn.copied {
+            background: #e8f5e9;
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 15px;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+            margin-top: 20px;
+        }
+
+        /* 动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        /* 小屏幕适配 */
+        @media (max-width: 380px) {
+            body {
+                padding: 12px;
+            }
+            
+            .card {
+                padding: 16px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            input {
+                padding: 12px 14px;
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>💰 大额存单转让计算器</h1>
+        <div class="subtitle">3年期 · 精准计算 · 一键分享</div>
+    </div>
+
+    <!-- 输入项专区 -->
+    <div class="card input-card">
+        <div class="card-header">
+            <div class="icon">📥</div>
+            <h2>输入项（必填）</h2>
+        </div>
+
+        <div class="form-group">
+            <label>转让挂牌利率 <span class="required">*</span></label>
+            <div class="input-wrapper">
+                <input type="number" id="listRate" step="0.0001" placeholder="例如：2.15">
+                <span class="unit">%</span>
+            </div>
+            <div class="tips">当前市场上该存单的挂牌利率</div>
+        </div>
+
+        <div class="form-group">
+            <label>存单面值 <span class="required">*</span></label>
+            <div class="input-wrapper">
+                <input type="number" id="faceValue" step="0.01" placeholder="例如：200000">
+                <span class="unit">元</span>
+            </div>
+            <div class="tips">存单原始面值金额</div>
+        </div>
+
+        <div class="form-group">
+            <label>存单利率 <span class="required">*</span></label>
+            <div class="input-wrapper">
+                <input type="number" id="cdRate" step="0.001" placeholder="例如：2.65">
+                <span class="unit">%</span>
+            </div>
+            <div class="tips">存单原始年利率</div>
+        </div>
+
+        <div class="form-group">
+            <label>存单现持有天数 <span class="required">*</span></label>
+            <div class="input-wrapper">
+                <input type="number" id="nowHoldDays" step="1" placeholder="例如：180">
+                <span class="unit">天</span>
+            </div>
+            <div class="tips">从存单生效至今已持有天数</div>
+        </div>
+
+        <div class="form-group">
+            <label>购买价格 <span class="required">*</span></label>
+            <div class="input-wrapper">
+                <input type="number" id="buyPrice" step="0.01" placeholder="例如：195000">
+                <span class="unit">元</span>
+            </div>
+            <div class="tips">您购买该存单的实际价格</div>
+        </div>
+
+        <div class="form-group">
+            <label>本人计划持有天数 <span class="required">*</span></label>
+            <div class="input-wrapper">
+                <input type="number" id="planHoldDays" step="1" placeholder="例如：365">
+                <span class="unit">天</span>
+            </div>
+            <div class="tips">您计划继续持有该存单的天数</div>
+        </div>
+    </div>
+
+    <button class="calc-btn" onclick="calculate()">🧮 立即计算</button>
+
+    <!-- 输出项专区 -->
+    <div class="card output-card">
+        <div class="card-header">
+            <div class="icon">📤</div>
+            <h2>计算结果</h2>
+        </div>
+
+        <div class="result-item">
+            <span class="result-label">转让价格</span>
+            <span class="result-value empty" id="transferPrice">--</span>
+        </div>
+        <div class="result-item">
+            <span class="result-label">转让方折算利率</span>
+            <span class="result-value empty" id="convertRate">--</span>
+        </div>
+
+        <button class="copy-btn" onclick="copyResult()">
+            <span id="copyIcon">📋</span>
+            <span id="copyText">复制计算结果</span>
+        </button>
+    </div>
+
+    <div class="footer">
+        小锤子出品 · 精准计算 · 理财助手
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// 显示提示
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2000);
+}
+
+// 输入验证
+function validateInput(id, name) {
+    const input = document.getElementById(id);
+    const value = parseFloat(input.value);
+    
+    if (input.value === '' || isNaN(value)) {
+        input.classList.add('error');
+        showToast(`请填写${name}`);
+        input.focus();
+        return null;
+    }
+    
+    input.classList.remove('error');
+    return value;
+}
+
+// 计算函数
+function calculate() {
+    // 获取并验证所有输入值
+    const listRate = validateInput('listRate', '转让挂牌利率');
+    if (listRate === null) return;
+    
+    const faceValue = validateInput('faceValue', '存单面值');
+    if (faceValue === null) return;
+    
+    const cdRate = validateInput('cdRate', '存单利率');
+    if (cdRate === null) return;
+    
+    const nowHoldDays = validateInput('nowHoldDays', '存单现持有天数');
+    if (nowHoldDays === null) return;
+    
+    const buyPrice = validateInput('buyPrice', '购买价格');
+    if (buyPrice === null) return;
+    
+    const planHoldDays = validateInput('planHoldDays', '本人计划持有天数');
+    if (planHoldDays === null) return;
+
+    // 验证逻辑
+    if (nowHoldDays + planHoldDays >= 365 * 3) {
+        showToast('持有天数总和不能超过3年');
+        document.getElementById('planHoldDays').classList.add('error');
+        return;
+    }
+
+    try {
+        // ===================== 核心公式计算 =====================
+        // 1. 剩余天数
+        const remainDays = 365 * 3 - nowHoldDays - planHoldDays + 1;
+
+        // 2. 计算转让价格
+        const listRateDecimal = listRate / 100;
+        const cdRateDecimal = cdRate / 100;
+        const transferPrice = (faceValue * (cdRateDecimal * 3 + 1)) / (listRateDecimal * remainDays / 365 + 1);
+
+        // 3. 计算转让方折算利率
+        let convertRate = 0;
+        if (buyPrice !== 0 && planHoldDays !== 0) {
+            convertRate = ((transferPrice - buyPrice) / buyPrice * 365 / planHoldDays) * 100;
+        }
+
+        // ===================== 输出结果 =====================
+        const transferPriceEl = document.getElementById('transferPrice');
+        const convertRateEl = document.getElementById('convertRate');
+        
+        transferPriceEl.innerText = transferPrice.toFixed(2) + ' 元';
+        convertRateEl.innerText = convertRate.toFixed(4) + ' %';
+        
+        transferPriceEl.classList.remove('empty');
+        convertRateEl.classList.remove('empty');
+
+        showToast('计算完成！');
+
+    } catch (e) {
+        showToast('计算出错：' + e.message);
+    }
+}
+
+// 复制结果
+function copyResult() {
+    const transferPrice = document.getElementById('transferPrice').innerText;
+    const convertRate = document.getElementById('convertRate').innerText;
+    
+    if (transferPrice === '--') {
+        showToast('请先进行计算');
+        return;
+    }
+    
+    const text = `【大额存单转让计算结果】\n转让价格：${transferPrice}\n转让方折算利率：${convertRate}\n\n计算工具：kdnsna.cn/cd-calculator`;
+    
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+            showCopySuccess();
+        }).catch(() => {
+            fallbackCopy(text);
+        });
+    } else {
+        fallbackCopy(text);
+    }
+}
+
+function fallbackCopy(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    
+    try {
+        document.execCommand('copy');
+        showCopySuccess();
+    } catch (err) {
+        showToast('复制失败，请手动复制');
+    }
+    
+    document.body.removeChild(textarea);
+}
+
+function showCopySuccess() {
+    const btn = document.querySelector('.copy-btn');
+    const icon = document.getElementById('copyIcon');
+    const text = document.getElementById('copyText');
+    
+    btn.classList.add('copied');
+    icon.textContent = '✅';
+    text.textContent = '已复制到剪贴板';
+    
+    showToast('结果已复制！');
+    
+    setTimeout(() => {
+        btn.classList.remove('copied');
+        icon.textContent = '📋';
+        text.textContent = '复制计算结果';
+    }, 2000);
+}
+
+// 输入时移除错误样式
+document.querySelectorAll('input').forEach(input => {
+    input.addEventListener('input', function() {
+        this.classList.remove('error');
+    });
+    
+    // 回车键触发计算
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            calculate();
+        }
+    });
+});
+
+// 页面加载完成后的欢迎提示
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        showToast('欢迎使用大额存单计算器！');
+    }, 500);
+});
+</script>
+
+</body>
+</html>
