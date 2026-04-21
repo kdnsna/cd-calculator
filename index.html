@@ -1,599 +1,1940 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#0288d1">
-    <title>3年期大额存单转让计算器</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0d47a1" />
+  <title>大额存单智慧计算器 · 场景版</title>
+<style>
+/* ============================================
+   大额存单智慧计算器 - 全局样式
+   ============================================ */
 
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 16px;
-            padding-bottom: 40px;
-        }
+:root {
+  --primary: #0d47a1;
+  --primary-light: #1976d2;
+  --primary-gradient: linear-gradient(135deg, #0d47a1 0%, #1976d2 100%);
+  --accent: #ff6d00;
+  --accent-light: #ff9800;
+  --success: #2e7d32;
+  --danger: #c62828;
+  --bg: #f0f4f8;
+  --card: #ffffff;
+  --text: #1a237e;
+  --text-secondary: #546e7a;
+  --text-muted: #90a4ae;
+  --border: #e3f2fd;
+  --shadow: 0 4px 20px rgba(13,71,161,0.10);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: all 0.3s ease;
+}
 
-        .container {
-            max-width: 480px;
-            margin: 0 auto;
-        }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-        .header {
-            text-align: center;
-            padding: 24px 0 20px;
-            color: white;
-        }
+html, body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
 
-        .header h1 {
-            font-size: 22px;
-            font-weight: 600;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            letter-spacing: 1px;
-        }
+#app {
+  max-width: 560px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+}
 
-        .header .subtitle {
-            font-size: 13px;
-            opacity: 0.9;
-            margin-top: 6px;
-        }
+.page {
+  display: none;
+  padding: 0 16px 40px;
+  animation: fadeIn 0.4s ease;
+}
+.page.active { display: block; }
 
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-        }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px dashed #e0e0e0;
-        }
+/* ============================================
+   首页 - Hero & 场景卡片
+   ============================================ */
+.hero {
+  text-align: center;
+  padding: 32px 0 20px;
+}
+.hero-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.9);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+.hero h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.3;
+}
+.hero-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 6px;
+}
 
-        .card-header .icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-        }
+.scene-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
 
-        .input-card .card-header .icon {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
+.scene-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: var(--transition);
+  border: 2px solid transparent;
+}
+.scene-card:hover, .scene-card:active {
+  transform: translateY(-2px);
+  border-color: var(--primary-light);
+  box-shadow: 0 8px 28px rgba(13,71,161,0.18);
+}
+.scene-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.scene-content { flex: 1; min-width: 0; }
+.scene-content h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.scene-content p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.scene-tags {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.tag {
+  font-size: 11px;
+  color: var(--primary);
+  background: #e3f2fd;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+.scene-arrow {
+  font-size: 22px;
+  color: var(--text-muted);
+  font-weight: 300;
+}
 
-        .output-card .card-header .icon {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-        }
+.home-footer {
+  text-align: center;
+  margin-top: 24px;
+}
 
-        .card-header h2 {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-        }
+/* ============================================
+   页面头部 & 向导
+   ============================================ */
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0 12px;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 10;
+}
+.page-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--primary);
+}
 
-        .form-group {
-            margin-bottom: 14px;
-        }
+.wizard {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px 16px;
+  box-shadow: var(--shadow);
+}
 
-        .form-group:last-child {
-            margin-bottom: 0;
-        }
+.wizard-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 6px;
+}
+.step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #cfd8dc;
+  transition: var(--transition);
+  position: relative;
+}
+.step-dot.active {
+  background: var(--primary);
+  box-shadow: 0 0 0 4px rgba(13,71,161,0.15);
+}
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: #cfd8dc;
+  max-width: 40px;
+}
+.step-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
 
-        label {
-            display: block;
-            margin-bottom: 6px;
-            color: #555;
-            font-size: 14px;
-            font-weight: 500;
-        }
+.step-panel {
+  display: none;
+}
+.step-panel.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
 
-        .required {
-            color: #e74c3c;
-        }
+.panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed #e0e0e0;
+}
 
-        .input-wrapper {
-            position: relative;
-        }
+/* ============================================
+   表单组件
+   ============================================ */
+.form-group {
+  margin-bottom: 16px;
+}
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.help-trigger {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: #fff;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.input-wrap {
+  position: relative;
+}
+input {
+  width: 100%;
+  padding: 14px 16px;
+  padding-right: 56px;
+  border: 2px solid #e3f2fd;
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  outline: none;
+  transition: var(--transition);
+  background: #fafbfc;
+  color: var(--text);
+}
+input:focus {
+  border-color: var(--primary-light);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(25,118,210,0.08);
+}
+input.error {
+  border-color: var(--danger);
+  background: #ffebee;
+}
+input[readonly] {
+  background: #eceff1;
+  color: var(--text-secondary);
+}
+.input-unit {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 14px;
+  pointer-events: none;
+}
+.input-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  padding-left: 2px;
+}
 
-        input {
-            width: 100%;
-            padding: 14px 16px;
-            padding-right: 50px;
-            border: 2px solid #e8e8e8;
-            border-radius: 12px;
-            font-size: 16px;
-            outline: none;
-            transition: all 0.3s ease;
-            background: #fafafa;
-        }
+/* 快速体验条 */
+.preset-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.chip {
+  background: #e8f5e9;
+  color: var(--success);
+  border: none;
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: var(--transition);
+}
+.chip:hover {
+  background: #c8e6c9;
+}
 
-        input:focus {
-            border-color: #0288d1;
-            background: white;
-            box-shadow: 0 0 0 4px rgba(2, 136, 209, 0.1);
-        }
+/* 快捷天数 */
+.quick-days {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.day-chip {
+  background: #e3f2fd;
+  color: var(--primary);
+  border: 1px solid #bbdefb;
+  padding: 5px 12px;
+  border-radius: 14px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: var(--transition);
+}
+.day-chip:hover, .day-chip.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
 
-        input.error {
-            border-color: #e74c3c;
-            background: #fff5f5;
-        }
+/* 信息提示框 */
+.info-box {
+  background: #e3f2fd;
+  border-left: 4px solid var(--primary-light);
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+.info-box strong {
+  color: var(--primary);
+}
 
-        .unit {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
-            font-size: 14px;
-            pointer-events: none;
-        }
+/* 假日选择网格 */
+.holiday-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.holiday-card {
+  background: #fafbfc;
+  border: 2px solid #e3f2fd;
+  border-radius: var(--radius-sm);
+  padding: 14px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.holiday-card:hover, .holiday-card.active {
+  border-color: var(--primary-light);
+  background: #e3f2fd;
+  transform: translateY(-2px);
+}
+.holiday-emoji {
+  font-size: 28px;
+  margin-bottom: 4px;
+}
+.holiday-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.holiday-info {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
 
-        .tips {
-            font-size: 12px;
-            color: #888;
-            margin-top: 4px;
-            padding-left: 4px;
-        }
+/* ============================================
+   按钮
+   ============================================ */
+.btn-primary, .btn-secondary, .btn-text, .btn-back, .btn-copy {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: var(--transition);
+  outline: none;
+}
+.btn-primary {
+  width: 100%;
+  padding: 15px;
+  background: var(--primary-gradient);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(13,71,161,0.25);
+  margin-top: 8px;
+}
+.btn-primary:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(13,71,161,0.2);
+}
+.btn-primary.btn-glow {
+  animation: pulseGlow 2s infinite;
+}
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 4px 16px rgba(13,71,161,0.25); }
+  50% { box-shadow: 0 4px 24px rgba(13,71,161,0.4); }
+}
+.btn-secondary {
+  flex: 1;
+  padding: 14px;
+  background: #eceff1;
+  color: var(--text-secondary);
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 14px;
+}
+.btn-secondary:active {
+  background: #cfd8dc;
+}
+.btn-text {
+  background: transparent;
+  color: var(--primary-light);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px;
+}
+.btn-back {
+  background: #eceff1;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 10px;
+}
+.btn-copy {
+  background: var(--primary-light);
+  color: #fff;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+.btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
 
-        .calc-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 14px;
-            font-size: 17px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 20px 0;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            position: relative;
-            overflow: hidden;
-        }
+/* ============================================
+   结果展示
+   ============================================ */
+.result-summary {
+  background: var(--primary-gradient);
+  color: #fff;
+  padding: 18px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  margin-bottom: 14px;
+}
+.result-summary .big-number {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 6px 0;
+}
+.result-summary .big-label {
+  font-size: 13px;
+  opacity: 0.9;
+}
+.result-summary .big-desc {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-top: 4px;
+}
 
-        .calc-btn:active {
-            transform: scale(0.98);
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-        }
+.result-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.result-card {
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.result-card.highlight {
+  background: #e8f5e9;
+  border-color: #a5d6a7;
+}
+.result-card.warn {
+  background: #ffebee;
+  border-color: #ef9a9a;
+}
+.result-card-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.result-card-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.result-card-value.positive { color: var(--success); }
+.result-card-value.negative { color: var(--danger); }
 
-        .calc-btn::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255,255,255,0.3);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
+/* 对比图 */
+.comparison-chart {
+  margin-bottom: 14px;
+}
+.chart-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.chart-label {
+  width: 80px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: right;
+  flex-shrink: 0;
+}
+.chart-bar-wrap {
+  flex: 1;
+  height: 28px;
+  background: #eceff1;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+.chart-bar {
+  height: 100%;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  transition: width 0.8s ease;
+  white-space: nowrap;
+}
+.chart-bar.bar-a { background: linear-gradient(90deg, #42a5f5, #1e88e5); }
+.chart-bar.bar-b { background: linear-gradient(90deg, #66bb6a, #43a047); }
+.chart-bar.bar-c { background: linear-gradient(90deg, #ef5350, #e53935); }
 
-        .calc-btn:active::after {
-            width: 300px;
-            height: 300px;
-        }
+/* 沟通建议盒子 */
+.script-box {
+  background: #f5f7fa;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: 16px;
+  border: 1px solid #e0e0e0;
+}
+.script-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: #eceff1;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.script-body {
+  padding: 14px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+.disclaimer {
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--danger);
+  background: #ffebee;
+  line-height: 1.6;
+}
 
-        .result-item {
-            background: linear-gradient(135deg, #fff9f0 0%, #fff5e6 100%);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            border: 1px solid #ffe4c4;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+/* ============================================
+   弹窗
+   ============================================ */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal.show { display: flex; }
+.modal-content {
+  background: var(--card);
+  border-radius: var(--radius);
+  max-width: 420px;
+  width: 100%;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  animation: modalUp 0.3s ease;
+}
+@keyframes modalUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 18px;
+  border-bottom: 1px solid #eee;
+}
+.modal-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--primary);
+}
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+}
+.modal-body {
+  padding: 16px 18px;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
 
-        .result-item:last-child {
-            margin-bottom: 0;
-        }
+/* 术语速查 */
+.glossary-item {
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed #e0e0e0;
+}
+.glossary-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.glossary-term {
+  font-weight: 600;
+  color: var(--primary);
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.glossary-def {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
 
-        .result-label {
-            font-size: 14px;
-            color: #666;
-            font-weight: 500;
-        }
+/* ============================================
+   辅助类
+   ============================================ */
+.hidden { display: none !important; }
 
-        .result-value {
-            font-size: 20px;
-            font-weight: 700;
-            color: #e65100;
-            font-family: 'SF Mono', Monaco, monospace;
-        }
+.toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  background: rgba(0,0,0,0.82);
+  color: #fff;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 15px;
+  z-index: 200;
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
 
-        .result-value.empty {
-            color: #bbb;
-            font-size: 16px;
-        }
+/* ============================================
+   响应式微调
+   ============================================ */
+@media (max-width: 380px) {
+  .hero h1 { font-size: 22px; }
+  .scene-icon { width: 40px; height: 40px; font-size: 18px; }
+  .holiday-grid { grid-template-columns: repeat(2, 1fr); }
+  .step-labels { font-size: 10px; }
+}
 
-        .copy-btn {
-            margin-top: 16px;
-            width: 100%;
-            padding: 12px;
-            background: #f5f5f5;
-            border: 1px dashed #ddd;
-            border-radius: 10px;
-            color: #666;
-            font-size: 14px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.3s ease;
-        }
-
-        .copy-btn:active {
-            background: #e8e8e8;
-        }
-
-        .copy-btn.copied {
-            background: #e8f5e9;
-            border-color: #4caf50;
-            color: #2e7d32;
-        }
-
-        .toast {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            background: rgba(0,0,0,0.8);
-            color: white;
-            padding: 14px 28px;
-            border-radius: 10px;
-            font-size: 15px;
-            z-index: 1000;
-            opacity: 0;
-            transition: all 0.3s ease;
-            pointer-events: none;
-        }
-
-        .toast.show {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 1;
-        }
-
-        .footer {
-            text-align: center;
-            color: rgba(255,255,255,0.7);
-            font-size: 12px;
-            margin-top: 20px;
-        }
-
-        /* 动画 */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .card {
-            animation: fadeInUp 0.5s ease forwards;
-        }
-
-        .card:nth-child(2) {
-            animation-delay: 0.1s;
-        }
-
-        .card:nth-child(3) {
-            animation-delay: 0.2s;
-        }
-
-        /* 小屏幕适配 */
-        @media (max-width: 380px) {
-            body {
-                padding: 12px;
-            }
-            
-            .card {
-                padding: 16px;
-            }
-            
-            .header h1 {
-                font-size: 20px;
-            }
-            
-            input {
-                padding: 12px 14px;
-                font-size: 15px;
-            }
-        }
-    </style>
+</style>
 </head>
 <body>
-
-<div class="container">
-    <div class="header">
-        <h1>💰 大额存单转让计算器</h1>
-        <div class="subtitle">3年期 · 精准计算 · 一键分享</div>
+  <div id="app">
+    <!-- 首页：场景选择 -->
+    <div id="page-home" class="page active">
+      <div class="hero">
+        <div class="hero-badge">银行零售业务专用</div>
+        <h1>大额存单智慧计算器</h1>
+        <p class="hero-desc">选对场景，一分钟讲明白收益逻辑</p>
+      </div>
+      <div class="scene-list">
+        <div class="scene-card" onclick="goScene('rateCut')">
+          <div class="scene-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">📉</div>
+          <div class="scene-content">
+            <h3>降息转让利差</h3>
+            <p>市场利率下行后，高息老存单在转让市场存在价差空间</p>
+            <div class="scene-tags">
+              <span class="tag">利率调整</span>
+              <span class="tag">利差收益</span>
+            </div>
+          </div>
+          <div class="scene-arrow">›</div>
+        </div>
+        <div class="scene-card" onclick="goScene('holiday')">
+          <div class="scene-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">🏖️</div>
+          <div class="scene-content">
+            <h3>假日资金泊车</h3>
+            <p>节假日理财/股票不记息，大额存单按日计息，假期也能持续生息</p>
+            <div class="scene-tags">
+              <span class="tag">假期生息</span>
+              <span class="tag">时点冲刺</span>
+            </div>
+          </div>
+          <div class="scene-arrow">›</div>
+        </div>
+        <div class="scene-card" onclick="goScene('early')">
+          <div class="scene-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">💸</div>
+          <div class="scene-content">
+            <h3>提前用款方案</h3>
+            <p>急用钱时，对比"提前支取（按活期）"vs"转让卖出"哪个更划算</p>
+            <div class="scene-tags">
+              <span class="tag">急用资金</span>
+              <span class="tag">最优方案</span>
+            </div>
+          </div>
+          <div class="scene-arrow">›</div>
+        </div>
+      </div>
+      <div class="home-footer">
+        <button class="btn-text" onclick="showGlossary()">📖 术语速查手册</button>
+      </div>
     </div>
 
-    <!-- 输入项专区 -->
-    <div class="card input-card">
-        <div class="card-header">
-            <div class="icon">📥</div>
-            <h2>输入项（必填）</h2>
+    <!-- 场景页：降息转让 -->
+    <div id="page-rateCut" class="page">
+      <div class="page-header">
+        <button class="btn-back" onclick="goHome()">‹ 返回</button>
+        <h2>降息转让利差</h2>
+      </div>
+      <div class="wizard" id="wizard-rateCut">
+        <div class="wizard-steps">
+          <div class="step-dot active" data-step="1"></div>
+          <div class="step-line"></div>
+          <div class="step-dot" data-step="2"></div>
+          <div class="step-line"></div>
+          <div class="step-dot" data-step="3"></div>
+          <div class="step-line"></div>
+          <div class="step-dot" data-step="4"></div>
+        </div>
+        <div class="step-labels">
+          <span>存单信息</span>
+          <span>市场利率</span>
+          <span>持有计划</span>
+          <span>查看结果</span>
         </div>
 
-        <div class="form-group">
-            <label>转让挂牌利率 <span class="required">*</span></label>
-            <div class="input-wrapper">
-                <input type="number" id="listRate" step="0.0001" placeholder="例如：2.15">
-                <span class="unit">%</span>
+        <!-- Step 1: 存单信息 -->
+        <div class="step-panel active" data-step="1">
+          <div class="panel-title">第一步：录入存单基本信息</div>
+          <div class="preset-bar">
+            <span>快速体验：</span>
+            <button class="chip" onclick="loadPreset('rateCut','case1')">案例：20万·2.65%·已持180天</button>
+          </div>
+          <div class="form-group">
+            <label>
+              存单面值
+              <span class="help-trigger" onclick="showHelp('faceValue')">?</span>
+            </label>
+            <div class="input-wrap">
+              <input type="number" id="rc-faceValue" placeholder="如 200000" step="10000" />
+              <span class="input-unit">元</span>
             </div>
-            <div class="tips">后期出售存单时的市场挂牌利率</div>
+            <div class="input-hint">存单上写的本金金额，最低20万起</div>
+          </div>
+          <div class="form-group">
+            <label>
+              存单年利率
+              <span class="help-trigger" onclick="showHelp('cdRate')">?</span>
+            </label>
+            <div class="input-wrap">
+              <input type="number" id="rc-cdRate" placeholder="如 2.65" step="0.01" />
+              <span class="input-unit">%</span>
+            </div>
+            <div class="input-hint">存单发行时的约定利率，老存单通常更高</div>
+          </div>
+          <div class="form-group">
+            <label>
+              已持有天数
+              <span class="help-trigger" onclick="showHelp('holdDays')">?</span>
+            </label>
+            <div class="input-wrap">
+              <input type="number" id="rc-nowHoldDays" placeholder="如 180" step="1" />
+              <span class="input-unit">天</span>
+            </div>
+            <div class="input-hint">从存单生效到今天一共多少天</div>
+          </div>
+          <button class="btn-primary" onclick="nextStep('rateCut')">下一步：填写市场利率 ›</button>
         </div>
 
-        <div class="form-group">
-            <label>存单面值 <span class="required">*</span></label>
-            <div class="input-wrapper">
-                <input type="number" id="faceValue" step="0.01" placeholder="例如：200000">
-                <span class="unit">元</span>
+        <!-- Step 2: 市场利率 -->
+        <div class="step-panel" data-step="2">
+          <div class="panel-title">第二步：当前市场挂牌利率</div>
+          <div class="info-box">
+            <strong>为什么要填这个？</strong><br/>
+            央行降息后，新发行的大额存单利率会下调。您手中高利率的"老存单"在市场上就值钱了——下家愿意溢价买走。
+          </div>
+          <div class="form-group">
+            <label>
+              当前市场挂牌利率（新存单利率）
+              <span class="help-trigger" onclick="showHelp('listRate')">?</span>
+            </label>
+            <div class="input-wrap">
+              <input type="number" id="rc-listRate" placeholder="如 2.15" step="0.01" />
+              <span class="input-unit">%</span>
             </div>
-            <div class="tips">存单原始面值金额</div>
+            <div class="input-hint">现在银行新卖的同期限存单利率，通常比老存单低</div>
+          </div>
+          <div class="form-group">
+            <label>
+              您的购买价格（买入时花了多少）
+              <span class="help-trigger" onclick="showHelp('buyPrice')">?</span>
+            </label>
+            <div class="input-wrap">
+              <input type="number" id="rc-buyPrice" placeholder="如 195000" step="100" />
+              <span class="input-unit">元</span>
+            </div>
+            <div class="input-hint">如果您是 original 持有人，填存单面值即可</div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-secondary" onclick="prevStep('rateCut')">‹ 上一步</button>
+            <button class="btn-primary" onclick="nextStep('rateCut')">下一步：持有计划 ›</button>
+          </div>
         </div>
 
-        <div class="form-group">
-            <label>存单利率 <span class="required">*</span></label>
-            <div class="input-wrapper">
-                <input type="number" id="cdRate" step="0.001" placeholder="例如：2.65">
-                <span class="unit">%</span>
+        <!-- Step 3: 持有计划 -->
+        <div class="step-panel" data-step="3">
+          <div class="panel-title">第三步：您打算持有多久？</div>
+          <div class="form-group">
+            <label>
+              计划再持有多长时间
+              <span class="help-trigger" onclick="showHelp('planHoldDays')">?</span>
+            </label>
+            <div class="quick-days">
+              <button class="day-chip" onclick="setDays('rc-planHoldDays',30)">1个月</button>
+              <button class="day-chip" onclick="setDays('rc-planHoldDays',90)">3个月</button>
+              <button class="day-chip" onclick="setDays('rc-planHoldDays',180)">6个月</button>
+              <button class="day-chip" onclick="setDays('rc-planHoldDays',365)">1年</button>
             </div>
-            <div class="tips">存单原始年利率</div>
+            <div class="input-wrap">
+              <input type="number" id="rc-planHoldDays" placeholder="如 365" step="1" />
+              <span class="input-unit">天</span>
+            </div>
+            <div class="input-hint">持有时间越长，转让溢价通常越高</div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-secondary" onclick="prevStep('rateCut')">‹ 上一步</button>
+            <button class="btn-primary btn-glow" onclick="calcRateCut()">立即计算 ›</button>
+          </div>
         </div>
 
-        <div class="form-group">
-            <label>存单现持有天数 <span class="required">*</span></label>
-            <div class="input-wrapper">
-                <input type="number" id="nowHoldDays" step="1" placeholder="例如：180">
-                <span class="unit">天</span>
+        <!-- Step 4: 结果 -->
+        <div class="step-panel" data-step="4">
+          <div class="panel-title">计算结果</div>
+          <div class="result-summary" id="rc-summary"></div>
+          <div class="result-cards" id="rc-results"></div>
+          <div class="comparison-chart" id="rc-chart"></div>
+          <div class="script-box">
+            <div class="script-header">
+              <span>客户沟通参考</span>
             </div>
-            <div class="tips">从存单生效至今已持有天数</div>
+            <div class="disclaimer">以下内容仅供客户经理内部学习参考，不代表银行承诺或保证，具体以实际产品条款为准。</div>
+            <div class="script-body" id="rc-script"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-secondary" onclick="resetWizard('rateCut')">重新计算</button>
+            <button class="btn-primary" onclick="goHome()">返回首页</button>
+          </div>
         </div>
-
-        <div class="form-group">
-            <label>购买价格 <span class="required">*</span></label>
-            <div class="input-wrapper">
-                <input type="number" id="buyPrice" step="0.01" placeholder="例如：195000">
-                <span class="unit">元</span>
-            </div>
-            <div class="tips">您购买该存单的实际价格</div>
-        </div>
-
-        <div class="form-group">
-            <label>本人计划持有天数 <span class="required">*</span></label>
-            <div class="input-wrapper">
-                <input type="number" id="planHoldDays" step="1" placeholder="例如：365">
-                <span class="unit">天</span>
-            </div>
-            <div class="tips">您计划继续持有该存单的天数</div>
-        </div>
+      </div>
     </div>
 
-    <button class="calc-btn" onclick="calculate()">🧮 立即计算</button>
-
-    <!-- 输出项专区 -->
-    <div class="card output-card">
-        <div class="card-header">
-            <div class="icon">📤</div>
-            <h2>计算结果</h2>
+    <!-- 场景页：假日泊车 -->
+    <div id="page-holiday" class="page">
+      <div class="page-header">
+        <button class="btn-back" onclick="goHome()">‹ 返回</button>
+        <h2>假日资金泊车</h2>
+      </div>
+      <div class="wizard" id="wizard-holiday">
+        <div class="wizard-steps">
+          <div class="step-dot active" data-step="1"></div>
+          <div class="step-line"></div>
+          <div class="step-dot" data-step="2"></div>
+          <div class="step-line"></div>
+          <div class="step-dot" data-step="3"></div>
+        </div>
+        <div class="step-labels">
+          <span>选择假期</span>
+          <span>资金信息</span>
+          <span>查看结果</span>
         </div>
 
-        <div class="result-item">
-            <span class="result-label">转让价格</span>
-            <span class="result-value empty" id="transferPrice">--</span>
-        </div>
-        <div class="result-item">
-            <span class="result-label">转让方折算利率</span>
-            <span class="result-value empty" id="convertRate">--</span>
+        <!-- Step 1: 选择假期 -->
+        <div class="step-panel active" data-step="1">
+          <div class="panel-title">第一步：选择即将到来的假期</div>
+          <div class="info-box">
+            节假日期间，股票休市、大部分T+0理财不确认份额，资金处于"空转"状态。大额存单<strong>按日计息</strong>，假期每一天都在生息。
+          </div>
+          <div class="holiday-grid">
+            <div class="holiday-card" onclick="selectHoliday(this,'春节',8,2.1)">
+              <div class="holiday-emoji">🧧</div>
+              <div class="holiday-name">春节长假</div>
+              <div class="holiday-info">约 7-10 天</div>
+            </div>
+            <div class="holiday-card" onclick="selectHoliday(this,'国庆',7,2.1)">
+              <div class="holiday-emoji">🇨🇳</div>
+              <div class="holiday-name">国庆长假</div>
+              <div class="holiday-info">约 7 天</div>
+            </div>
+            <div class="holiday-card" onclick="selectHoliday(this,'五一',5,2.1)">
+              <div class="holiday-emoji">🎉</div>
+              <div class="holiday-name">五一假期</div>
+              <div class="holiday-info">约 3-5 天</div>
+            </div>
+            <div class="holiday-card" onclick="selectHoliday(this,'清明/端午/中秋',3,2.1)">
+              <div class="holiday-emoji">🌿</div>
+              <div class="holiday-name">小长假</div>
+              <div class="holiday-info">约 3 天</div>
+            </div>
+            <div class="holiday-card" onclick="selectHoliday(this,'元旦',3,2.1)">
+              <div class="holiday-emoji">🎆</div>
+              <div class="holiday-name">元旦假期</div>
+              <div class="holiday-info">约 3 天</div>
+            </div>
+            <div class="holiday-card" onclick="selectHoliday(this,'自定义',0,2.1)">
+              <div class="holiday-emoji">📅</div>
+              <div class="holiday-name">自定义天数</div>
+              <div class="holiday-info">手动输入</div>
+            </div>
+          </div>
+          <div id="holiday-custom-wrap" class="form-group hidden" style="margin-top:12px;">
+            <label>自定义假期天数</label>
+            <div class="input-wrap">
+              <input type="number" id="hl-customDays" placeholder="如 5" step="1" />
+              <span class="input-unit">天</span>
+            </div>
+          </div>
+          <button class="btn-primary" onclick="nextStep('holiday')">下一步：填写资金信息 ›</button>
         </div>
 
-        <button class="copy-btn" onclick="copyResult()">
-            <span id="copyIcon">📋</span>
-            <span id="copyText">复制计算结果</span>
-        </button>
+        <!-- Step 2: 资金信息 -->
+        <div class="step-panel" data-step="2">
+          <div class="panel-title">第二步：填写资金与利率信息</div>
+          <div class="preset-bar">
+            <span>快速体验：</span>
+            <button class="chip" onclick="loadPreset('holiday','case1')">100万·2.1%·国庆7天</button>
+          </div>
+          <div class="form-group">
+            <label>假期可用资金金额</label>
+            <div class="input-wrap">
+              <input type="number" id="hl-amount" placeholder="如 1000000" step="10000" />
+              <span class="input-unit">元</span>
+            </div>
+            <div class="input-hint">客户计划用于购买大额存单的资金</div>
+          </div>
+          <div class="form-group">
+            <label>大额存单年利率</label>
+            <div class="input-wrap">
+              <input type="number" id="hl-cdRate" placeholder="如 2.1" step="0.01" />
+              <span class="input-unit">%</span>
+            </div>
+            <div class="input-hint">当前在售大额存单利率</div>
+          </div>
+          <div class="form-group">
+            <label>假期天数（已自动填入）</label>
+            <div class="input-wrap">
+              <input type="number" id="hl-days" placeholder="如 7" step="1" readonly />
+              <span class="input-unit">天</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>对比：活期利率 / 货币基金利率（可选）</label>
+            <div class="input-wrap">
+              <input type="number" id="hl-compareRate" placeholder="如 0.25" step="0.01" />
+              <span class="input-unit">%</span>
+            </div>
+            <div class="input-hint">不填则默认使用 0.25% 活期利率对比</div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-secondary" onclick="prevStep('holiday')">‹ 上一步</button>
+            <button class="btn-primary btn-glow" onclick="calcHoliday()">立即计算 ›</button>
+          </div>
+        </div>
+
+        <!-- Step 3: 结果 -->
+        <div class="step-panel" data-step="3">
+          <div class="panel-title">计算结果</div>
+          <div class="result-summary" id="hl-summary"></div>
+          <div class="result-cards" id="hl-results"></div>
+          <div class="comparison-chart" id="hl-chart"></div>
+          <div class="script-box">
+            <div class="script-header">
+              <span>客户沟通参考</span>
+            </div>
+            <div class="disclaimer">以下内容仅供客户经理内部学习参考，不代表银行承诺或保证，具体以实际产品条款为准。</div>
+            <div class="script-body" id="hl-script"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-secondary" onclick="resetWizard('holiday')">重新计算</button>
+            <button class="btn-primary" onclick="goHome()">返回首页</button>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="footer">
-        小锤子出品 · 精准计算 · 理财助手
+    <!-- 场景页：提前用款 -->
+    <div id="page-early" class="page">
+      <div class="page-header">
+        <button class="btn-back" onclick="goHome()">‹ 返回</button>
+        <h2>提前用款方案对比</h2>
+      </div>
+      <div class="wizard" id="wizard-early">
+        <div class="wizard-steps">
+          <div class="step-dot active" data-step="1"></div>
+          <div class="step-line"></div>
+          <div class="step-dot" data-step="2"></div>
+          <div class="step-line"></div>
+          <div class="step-dot" data-step="3"></div>
+        </div>
+        <div class="step-labels">
+          <span>存单信息</span>
+          <span>用款需求</span>
+          <span>查看结果</span>
+        </div>
+
+        <!-- Step 1: 存单信息 -->
+        <div class="step-panel active" data-step="1">
+          <div class="panel-title">第一步：录入存单基本信息</div>
+          <div class="preset-bar">
+            <span>快速体验：</span>
+            <button class="chip" onclick="loadPreset('early','case1')">50万·2.8%·已持1年</button>
+          </div>
+          <div class="form-group">
+            <label>存单面值</label>
+            <div class="input-wrap">
+              <input type="number" id="ew-faceValue" placeholder="如 500000" step="10000" />
+              <span class="input-unit">元</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>存单年利率</label>
+            <div class="input-wrap">
+              <input type="number" id="ew-cdRate" placeholder="如 2.8" step="0.01" />
+              <span class="input-unit">%</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>已持有天数</label>
+            <div class="input-wrap">
+              <input type="number" id="ew-nowHoldDays" placeholder="如 365" step="1" />
+              <span class="input-unit">天</span>
+            </div>
+            <div class="input-hint">持有时间越长，已累积利息越多</div>
+          </div>
+          <div class="form-group">
+            <label>购买价格（买入时实际花费）</label>
+            <div class="input-wrap">
+              <input type="number" id="ew-buyPrice" placeholder="如 500000" step="100" />
+              <span class="input-unit">元</span>
+            </div>
+            <div class="input-hint">original 持有人填面值，二手买家填实际买入价</div>
+          </div>
+          <button class="btn-primary" onclick="nextStep('early')">下一步：填写用款需求 ›</button>
+        </div>
+
+        <!-- Step 2: 用款需求 -->
+        <div class="step-panel" data-step="2">
+          <div class="panel-title">第二步：客户用款需求</div>
+          <div class="info-box">
+            客户急用钱，有两个选择：<br/>
+            <strong>方案A - 提前支取：</strong>银行按活期利率（约0.25%）结算已持有天数的利息，立马到账。<br/>
+            <strong>方案B - 转让卖出：</strong>把存单挂到转让区，下家按当前市场利率接盘，通常比提前支取划算。
+          </div>
+          <div class="form-group">
+            <label>当前市场挂牌利率（新存单利率）</label>
+            <div class="input-wrap">
+              <input type="number" id="ew-listRate" placeholder="如 2.1" step="0.01" />
+              <span class="input-unit">%</span>
+            </div>
+            <div class="input-hint">影响转让价格的当前市场利率</div>
+          </div>
+          <div class="form-group">
+            <label>活期利率（银行提前支取结算利率）</label>
+            <div class="input-wrap">
+              <input type="number" id="ew-demandRate" placeholder="如 0.25" step="0.01" value="0.25" />
+              <span class="input-unit">%</span>
+            </div>
+            <div class="input-hint">大部分银行提前支取按活期 0.25% 计息</div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-secondary" onclick="prevStep('early')">‹ 上一步</button>
+            <button class="btn-primary btn-glow" onclick="calcEarly()">立即对比 ›</button>
+          </div>
+        </div>
+
+        <!-- Step 3: 结果 -->
+        <div class="step-panel" data-step="3">
+          <div class="panel-title">两种方案对比结果</div>
+          <div class="result-summary" id="ew-summary"></div>
+          <div class="result-cards" id="ew-results"></div>
+          <div class="comparison-chart" id="ew-chart"></div>
+          <div class="script-box">
+            <div class="script-header">
+              <span>客户沟通参考</span>
+            </div>
+            <div class="disclaimer">以下内容仅供客户经理内部学习参考，不代表银行承诺或保证，具体以实际产品条款为准。</div>
+            <div class="script-body" id="ew-script"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-secondary" onclick="resetWizard('early')">重新计算</button>
+            <button class="btn-primary" onclick="goHome()">返回首页</button>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
 
-<div class="toast" id="toast"></div>
+    <!-- 术语弹窗 -->
+    <div id="help-modal" class="modal" onclick="closeModal(event)">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3 id="help-title">术语解释</h3>
+          <button class="modal-close" onclick="hideHelp()">✕</button>
+        </div>
+        <div class="modal-body" id="help-body"></div>
+      </div>
+    </div>
 
+    <!-- 术语速查 -->
+    <div id="glossary-modal" class="modal" onclick="closeModal(event)">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3>术语速查手册</h3>
+          <button class="modal-close" onclick="hideGlossary()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="glossary-item">
+            <div class="glossary-term">存单面值</div>
+            <div class="glossary-def">存单到期时银行返还的本金金额，大额存单一般20万起。</div>
+          </div>
+          <div class="glossary-item">
+            <div class="glossary-term">存单利率</div>
+            <div class="glossary-def">存单发行时约定的年化利率，持有期间按此利率计息。</div>
+          </div>
+          <div class="glossary-item">
+            <div class="glossary-term">挂牌利率</div>
+            <div class="glossary-def">当前市场上新发行同期限存单的利率，通常随央行降息而下调。</div>
+          </div>
+          <div class="glossary-item">
+            <div class="glossary-term">转让价格</div>
+            <div class="glossary-def">把存单卖给下家时的成交价。老存单利率高于市场利率时，转让价通常高于面值（溢价）。</div>
+          </div>
+          <div class="glossary-item">
+            <div class="glossary-term">折算利率</div>
+            <div class="glossary-def">您持有这段时间的实际年化收益率，考虑了买入价和卖出价的差额。</div>
+          </div>
+          <div class="glossary-item">
+            <div class="glossary-term">提前支取</div>
+            <div class="glossary-def">未到期时找银行取钱，利息按活期利率（约0.25%）计算，损失较大。</div>
+          </div>
+          <div class="glossary-item">
+            <div class="glossary-term">可转让</div>
+            <div class="glossary-def">大额存单支持在二级市场挂卖，下家接盘后您提前拿回本金+收益，不用按活期。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
 <script>
-// 显示提示
-function showToast(message) {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.classList.add('show');
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 2000);
+/**
+ * 大额存单智慧计算器 - 核心逻辑
+ * 场景：降息转让 / 假日泊车 / 提前用款
+ */
+
+// ========================
+// 状态管理
+// ========================
+const state = {
+  rateCut: { step: 1, maxStep: 4 },
+  holiday: { step: 1, maxStep: 3, selectedHoliday: null },
+  early: { step: 1, maxStep: 3 }
+};
+
+// ========================
+// 页面导航
+// ========================
+function goHome() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-home').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// 输入验证
-function validateInput(id, name) {
-    const input = document.getElementById(id);
-    const value = parseFloat(input.value);
-    
-    if (input.value === '' || isNaN(value)) {
-        input.classList.add('error');
-        showToast(`请填写${name}`);
-        input.focus();
-        return null;
+function goScene(scene) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + scene).classList.add('active');
+  resetWizard(scene);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ========================
+// 向导步骤控制
+// ========================
+function setStep(scene, step) {
+  const s = state[scene];
+  s.step = step;
+
+  // 更新向导圆点
+  const wizard = document.getElementById('wizard-' + scene);
+  wizard.querySelectorAll('.step-dot').forEach((dot, idx) => {
+    dot.classList.toggle('active', idx + 1 === step);
+  });
+
+  // 更新面板
+  wizard.querySelectorAll('.step-panel').forEach(panel => {
+    panel.classList.toggle('active', parseInt(panel.dataset.step) === step);
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function nextStep(scene) {
+  const s = state[scene];
+  if (validateStep(scene, s.step)) {
+    if (s.step < s.maxStep) {
+      setStep(scene, s.step + 1);
     }
-    
+  }
+}
+
+function prevStep(scene) {
+  const s = state[scene];
+  if (s.step > 1) {
+    setStep(scene, s.step - 1);
+  }
+}
+
+function resetWizard(scene) {
+  state[scene].step = 1;
+  // 清除输入
+  const page = document.getElementById('page-' + scene);
+  page.querySelectorAll('input').forEach(input => {
+    input.value = '';
     input.classList.remove('error');
-    return value;
+  });
+  // 清除假日选择
+  if (scene === 'holiday') {
+    state.holiday.selectedHoliday = null;
+    page.querySelectorAll('.holiday-card').forEach(c => c.classList.remove('active'));
+    document.getElementById('holiday-custom-wrap').classList.add('hidden');
+  }
+  setStep(scene, 1);
 }
 
-// 计算函数
-function calculate() {
-    // 获取并验证所有输入值
-    const listRate = validateInput('listRate', '转让挂牌利率');
-    if (listRate === null) return;
-    
-    const faceValue = validateInput('faceValue', '存单面值');
-    if (faceValue === null) return;
-    
-    const cdRate = validateInput('cdRate', '存单利率');
-    if (cdRate === null) return;
-    
-    const nowHoldDays = validateInput('nowHoldDays', '存单现持有天数');
-    if (nowHoldDays === null) return;
-    
-    const buyPrice = validateInput('buyPrice', '购买价格');
-    if (buyPrice === null) return;
-    
-    const planHoldDays = validateInput('planHoldDays', '本人计划持有天数');
-    if (planHoldDays === null) return;
+// ========================
+// 步骤验证
+// ========================
+function validateStep(scene, step) {
+  const getVal = (id) => {
+    const el = document.getElementById(id);
+    const v = parseFloat(el.value);
+    if (el.value === '' || isNaN(v) || v < 0) {
+      el.classList.add('error');
+      el.focus();
+      showToast('请填写有效数值');
+      return null;
+    }
+    el.classList.remove('error');
+    return v;
+  };
 
-    // 验证逻辑
-    if (nowHoldDays + planHoldDays >= 365 * 3) {
+  if (scene === 'rateCut') {
+    if (step === 1) {
+      if (getVal('rc-faceValue') === null) return false;
+      if (getVal('rc-cdRate') === null) return false;
+      if (getVal('rc-nowHoldDays') === null) return false;
+    }
+    if (step === 2) {
+      if (getVal('rc-listRate') === null) return false;
+      if (getVal('rc-buyPrice') === null) return false;
+    }
+    if (step === 3) {
+      const d = getVal('rc-planHoldDays');
+      if (d === null) return false;
+      const now = parseFloat(document.getElementById('rc-nowHoldDays').value) || 0;
+      if (now + d >= 365 * 3) {
         showToast('持有天数总和不能超过3年');
-        document.getElementById('planHoldDays').classList.add('error');
-        return;
+        document.getElementById('rc-planHoldDays').classList.add('error');
+        return false;
+      }
     }
+  }
 
-    try {
-        // ===================== 核心公式计算 =====================
-        // 1. 剩余天数
-        const remainDays = 365 * 3 - nowHoldDays - planHoldDays + 1;
-
-        // 2. 计算转让价格
-        const listRateDecimal = listRate / 100;
-        const cdRateDecimal = cdRate / 100;
-        const transferPrice = (faceValue * (cdRateDecimal * 3 + 1)) / (listRateDecimal * remainDays / 365 + 1);
-
-        // 3. 计算转让方折算利率
-        let convertRate = 0;
-        if (buyPrice !== 0 && planHoldDays !== 0) {
-            convertRate = ((transferPrice - buyPrice) / buyPrice * 365 / planHoldDays) * 100;
-        }
-
-        // ===================== 输出结果 =====================
-        const transferPriceEl = document.getElementById('transferPrice');
-        const convertRateEl = document.getElementById('convertRate');
-        
-        transferPriceEl.innerText = transferPrice.toFixed(2) + ' 元';
-        convertRateEl.innerText = convertRate.toFixed(4) + ' %';
-        
-        transferPriceEl.classList.remove('empty');
-        convertRateEl.classList.remove('empty');
-
-        showToast('计算完成！');
-
-    } catch (e) {
-        showToast('计算出错：' + e.message);
+  if (scene === 'holiday') {
+    if (step === 1) {
+      const h = state.holiday.selectedHoliday;
+      if (!h) {
+        showToast('请先选择一个假期');
+        return false;
+      }
+      if (h.name === '自定义') {
+        const d = getVal('hl-customDays');
+        if (d === null) return false;
+        h.days = d;
+      }
     }
+    if (step === 2) {
+      if (getVal('hl-amount') === null) return false;
+      if (getVal('hl-cdRate') === null) return false;
+    }
+  }
+
+  if (scene === 'early') {
+    if (step === 1) {
+      if (getVal('ew-faceValue') === null) return false;
+      if (getVal('ew-cdRate') === null) return false;
+      if (getVal('ew-nowHoldDays') === null) return false;
+      if (getVal('ew-buyPrice') === null) return false;
+    }
+    if (step === 2) {
+      if (getVal('ew-listRate') === null) return false;
+    }
+  }
+
+  return true;
 }
 
-// 复制结果
-function copyResult() {
-    const transferPrice = document.getElementById('transferPrice').innerText;
-    const convertRate = document.getElementById('convertRate').innerText;
-    
-    if (transferPrice === '--') {
-        showToast('请先进行计算');
-        return;
-    }
-    
-    const text = `【大额存单转让计算结果】\n转让价格：${transferPrice}\n转让方折算利率：${convertRate}`;
-    
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(() => {
-            showCopySuccess();
-        }).catch(() => {
-            fallbackCopy(text);
-        });
-    } else {
-        fallbackCopy(text);
-    }
+// ========================
+// 预设案例加载
+// ========================
+const presets = {
+  rateCut: {
+    case1: { faceValue: 200000, cdRate: 2.65, nowHoldDays: 180, listRate: 2.15, buyPrice: 200000, planHoldDays: 365 }
+  },
+  holiday: {
+    case1: { amount: 1000000, cdRate: 2.1, days: 7, compareRate: 0.25, holidayName: '国庆长假' }
+  },
+  early: {
+    case1: { faceValue: 500000, cdRate: 2.8, nowHoldDays: 365, buyPrice: 500000, listRate: 2.1, demandRate: 0.25 }
+  }
+};
+
+function loadPreset(scene, caseKey) {
+  const p = presets[scene][caseKey];
+  if (!p) return;
+
+  if (scene === 'rateCut') {
+    document.getElementById('rc-faceValue').value = p.faceValue;
+    document.getElementById('rc-cdRate').value = p.cdRate;
+    document.getElementById('rc-nowHoldDays').value = p.nowHoldDays;
+    document.getElementById('rc-listRate').value = p.listRate;
+    document.getElementById('rc-buyPrice').value = p.buyPrice;
+    document.getElementById('rc-planHoldDays').value = p.planHoldDays;
+  }
+  if (scene === 'holiday') {
+    document.getElementById('hl-amount').value = p.amount;
+    document.getElementById('hl-cdRate').value = p.cdRate;
+    document.getElementById('hl-days').value = p.days;
+    document.getElementById('hl-compareRate').value = p.compareRate;
+    // 选中对应假日卡片
+    document.querySelectorAll('#page-holiday .holiday-card').forEach(card => {
+      if (card.querySelector('.holiday-name').textContent === p.holidayName) {
+        selectHoliday(card, p.holidayName, p.days, p.cdRate);
+      }
+    });
+  }
+  if (scene === 'early') {
+    document.getElementById('ew-faceValue').value = p.faceValue;
+    document.getElementById('ew-cdRate').value = p.cdRate;
+    document.getElementById('ew-nowHoldDays').value = p.nowHoldDays;
+    document.getElementById('ew-buyPrice').value = p.buyPrice;
+    document.getElementById('ew-listRate').value = p.listRate;
+    document.getElementById('ew-demandRate').value = p.demandRate;
+  }
+
+  showToast('已填入案例数据');
 }
 
-function fallbackCopy(text) {
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-    document.body.appendChild(textarea);
-    textarea.select();
-    
-    try {
-        document.execCommand('copy');
-        showCopySuccess();
-    } catch (err) {
-        showToast('复制失败，请手动复制');
-    }
-    
-    document.body.removeChild(textarea);
+// ========================
+// 假日选择
+// ========================
+function selectHoliday(card, name, days, rate) {
+  document.querySelectorAll('#page-holiday .holiday-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+
+  const customWrap = document.getElementById('holiday-custom-wrap');
+  if (name === '自定义') {
+    customWrap.classList.remove('hidden');
+    state.holiday.selectedHoliday = { name, days: 0, rate };
+  } else {
+    customWrap.classList.add('hidden');
+    document.getElementById('hl-days').value = days;
+    state.holiday.selectedHoliday = { name, days, rate };
+  }
 }
 
-function showCopySuccess() {
-    const btn = document.querySelector('.copy-btn');
-    const icon = document.getElementById('copyIcon');
-    const text = document.getElementById('copyText');
-    
-    btn.classList.add('copied');
-    icon.textContent = '✅';
-    text.textContent = '已复制到剪贴板';
-    
-    showToast('结果已复制！');
-    
-    setTimeout(() => {
-        btn.classList.remove('copied');
-        icon.textContent = '📋';
-        text.textContent = '复制计算结果';
-    }, 2000);
+function setDays(inputId, days) {
+  document.getElementById(inputId).value = days;
+  // 高亮选中
+  const wrap = document.getElementById(inputId).closest('.form-group');
+  if (wrap) {
+    wrap.querySelectorAll('.day-chip').forEach(chip => {
+      chip.classList.toggle('active', chip.textContent.includes(days === 30 ? '1个月' : days === 90 ? '3个月' : days === 180 ? '6个月' : '1年'));
+    });
+  }
 }
 
-// 输入时移除错误样式
-document.querySelectorAll('input').forEach(input => {
+// ========================
+// 计算核心 - 降息转让
+// ========================
+function calcRateCut() {
+  const faceValue = parseFloat(document.getElementById('rc-faceValue').value);
+  const cdRate = parseFloat(document.getElementById('rc-cdRate').value);
+  const nowHoldDays = parseFloat(document.getElementById('rc-nowHoldDays').value);
+  const listRate = parseFloat(document.getElementById('rc-listRate').value);
+  const buyPrice = parseFloat(document.getElementById('rc-buyPrice').value);
+  const planHoldDays = parseFloat(document.getElementById('rc-planHoldDays').value);
+
+  if ([faceValue, cdRate, nowHoldDays, listRate, buyPrice, planHoldDays].some(v => isNaN(v) || v < 0)) {
+    showToast('请检查所有输入');
+    return;
+  }
+  if (nowHoldDays + planHoldDays >= 365 * 3) {
+    showToast('持有天数总和不能超过3年');
+    return;
+  }
+
+  // 核心公式
+  const remainDays = 365 * 3 - nowHoldDays - planHoldDays + 1;
+  const listRateDec = listRate / 100;
+  const cdRateDec = cdRate / 100;
+  const transferPrice = (faceValue * (cdRateDec * 3 + 1)) / (listRateDec * remainDays / 365 + 1);
+  const convertRate = buyPrice !== 0 && planHoldDays !== 0
+    ? ((transferPrice - buyPrice) / buyPrice * 365 / planHoldDays) * 100
+    : 0;
+
+  // 已产生利息
+  const accruedInterest = faceValue * cdRateDec * nowHoldDays / 365;
+  // 持有期收益
+  const holdIncome = transferPrice - buyPrice;
+  // 总收益（如果original持有人）
+  const totalIncome = transferPrice - buyPrice + accruedInterest;
+
+  // 展示结果
+  const summaryEl = document.getElementById('rc-summary');
+  summaryEl.innerHTML = `
+    <div class="big-label">预计转让价格</div>
+    <div class="big-number">¥${fmtMoney(transferPrice)}</div>
+    <div class="big-desc">您的持有期折算年化收益率约 ${convertRate.toFixed(2)}%</div>
+  `;
+
+  const resultsEl = document.getElementById('rc-results');
+  resultsEl.innerHTML = `
+    <div class="result-card">
+      <span class="result-card-label">存单面值</span>
+      <span class="result-card-value">¥${fmtMoney(faceValue)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-card-label">已持有天数</span>
+      <span class="result-card-value">${Math.round(nowHoldDays)} 天</span>
+    </div>
+    <div class="result-card">
+      <span class="result-card-label">已产生利息</span>
+      <span class="result-card-value positive">+¥${fmtMoney(accruedInterest)}</span>
+    </div>
+    <div class="result-card highlight">
+      <span class="result-card-label">转让溢价/折价</span>
+      <span class="result-card-value ${holdIncome >= 0 ? 'positive' : 'negative'}">${holdIncome >= 0 ? '+' : ''}¥${fmtMoney(holdIncome)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-card-label">剩余期限（转让后）</span>
+      <span class="result-card-value">${Math.round(remainDays)} 天</span>
+    </div>
+  `;
+
+  // 对比图
+  const maxVal = Math.max(buyPrice, transferPrice, faceValue);
+  const chartEl = document.getElementById('rc-chart');
+  chartEl.innerHTML = `
+    <div class="chart-row">
+      <div class="chart-label">买入价</div>
+      <div class="chart-bar-wrap">
+        <div class="chart-bar bar-a" style="width:${(buyPrice/maxVal*100).toFixed(1)}%">¥${fmtMoney(buyPrice)}</div>
+      </div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-label">存单面值</div>
+      <div class="chart-bar-wrap">
+        <div class="chart-bar bar-b" style="width:${(faceValue/maxVal*100).toFixed(1)}%">¥${fmtMoney(faceValue)}</div>
+      </div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-label">转让价格</div>
+      <div class="chart-bar-wrap">
+        <div class="chart-bar bar-c" style="width:${(transferPrice/maxVal*100).toFixed(1)}%">¥${fmtMoney(transferPrice)}</div>
+      </div>
+    </div>
+  `;
+
+  // 沟通建议生成
+  const isPremium = holdIncome > 0;
+  const scriptEl = document.getElementById('rc-script');
+  scriptEl.textContent = generateRateCutScript({
+    faceValue, cdRate, nowHoldDays, listRate, buyPrice, planHoldDays,
+    transferPrice, convertRate, accruedInterest, holdIncome, isPremium, remainDays
+  });
+
+  setStep('rateCut', 4);
+  showToast('计算完成！');
+}
+
+// ========================
+// 计算核心 - 假日泊车
+// ========================
+function calcHoliday() {
+  const amount = parseFloat(document.getElementById('hl-amount').value);
+  const cdRate = parseFloat(document.getElementById('hl-cdRate').value);
+  const days = parseFloat(document.getElementById('hl-days').value);
+  const compareRate = parseFloat(document.getElementById('hl-compareRate').value) || 0.25;
+  const holidayName = state.holiday.selectedHoliday?.name || '假期';
+
+  if ([amount, cdRate, days].some(v => isNaN(v) || v <= 0)) {
+    showToast('请检查所有输入');
+    return;
+  }
+
+  const cdRateDec = cdRate / 100;
+  const compareRateDec = compareRate / 100;
+
+  // 假期收益
+  const cdIncome = amount * cdRateDec * days / 365;
+  const compareIncome = amount * compareRateDec * days / 365;
+  const extraIncome = cdIncome - compareIncome;
+
+  // 日均提升（假设月末/季末时点）
+  const dailyBoost = amount;
+
+  const summaryEl = document.getElementById('hl-summary');
+  summaryEl.innerHTML = `
+    <div class="big-label">${holidayName} · ${Math.round(days)}天</div>
+    <div class="big-number">+¥${fmtMoney(extraIncome)}</div>
+    <div class="big-desc">与${compareRate}%活期/货币基金的收益差额</div>
+  `;
+
+  const resultsEl = document.getElementById('hl-results');
+  resultsEl.innerHTML = `
+    <div class="result-card">
+      <span class="result-card-label">投入金额</span>
+      <span class="result-card-value">¥${fmtMoney(amount)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-card-label">假期天数</span>
+      <span class="result-card-value">${Math.round(days)} 天</span>
+    </div>
+    <div class="result-card">
+      <span class="result-card-label">大额存单收益</span>
+      <span class="result-card-value positive">+¥${fmtMoney(cdIncome)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-card-label">活期/货基收益</span>
+      <span class="result-card-value">+¥${fmtMoney(compareIncome)}</span>
+    </div>
+    <div class="result-card highlight">
+      <span class="result-card-label"><strong>收益差额</strong></span>
+      <span class="result-card-value positive"><strong>+¥${fmtMoney(extraIncome)}</strong></span>
+    </div>
+    <div class="result-card">
+      <span class="result-card-label">相当于年化提升</span>
+      <span class="result-card-value positive">+${(cdRate - compareRate).toFixed(2)}%</span>
+    </div>
+  `;
+
+  const maxInc = Math.max(cdIncome, compareIncome, 1);
+  const chartEl = document.getElementById('hl-chart');
+  chartEl.innerHTML = `
+    <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">收益对比</div>
+    <div class="chart-row">
+      <div class="chart-label">大额存单</div>
+      <div class="chart-bar-wrap">
+        <div class="chart-bar bar-b" style="width:${(cdIncome/maxInc*100).toFixed(1)}%">+¥${fmtMoney(cdIncome)}</div>
+      </div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-label">活期/货基</div>
+      <div class="chart-bar-wrap">
+        <div class="chart-bar bar-a" style="width:${(compareIncome/maxInc*100).toFixed(1)}%">+¥${fmtMoney(compareIncome)}</div>
+      </div>
+    </div>
+  `;
+
+  const scriptEl = document.getElementById('hl-script');
+  scriptEl.textContent = generateHolidayScript({
+    holidayName, days, amount, cdRate, compareRate, cdIncome, compareIncome, extraIncome, dailyBoost
+  });
+
+  setStep('holiday', 3);
+  showToast('计算完成！');
+}
+
+// ========================
+// 计算核心 - 提前用款
+// ========================
+function calcEarly() {
+  const faceValue = parseFloat(document.getElementById('ew-faceValue').value);
+  const cdRate = parseFloat(document.getElementById('ew-cdRate').value);
+  const nowHoldDays = parseFloat(document.getElementById('ew-nowHoldDays').value);
+  const buyPrice = parseFloat(document.getElementById('ew-buyPrice').value);
+  const listRate = parseFloat(document.getElementById('ew-listRate').value);
+  const demandRate = parseFloat(document.getElementById('ew-demandRate').value) || 0.25;
+
+  if ([faceValue, cdRate, nowHoldDays, buyPrice, listRate].some(v => isNaN(v) || v < 0)) {
+    showToast('请检查所有输入');
+    return;
+  }
+
+  const cdRateDec = cdRate / 100;
+  const listRateDec = listRate / 100;
+  const demandRateDec = demandRate / 100;
+  const remainDays = 365 * 3 - nowHoldDays + 1;
+
+  // 方案A：提前支取
+  const demandInterest = faceValue * demandRateDec * nowHoldDays / 365;
+  const demandTotal = buyPrice + demandInterest; // 实际上提前支取是拿面值+活期利息，但如果是二手买家要考虑买入价
+  // 简化：original持有人提前支取 = faceValue + 活期利息；二手买家 = buyPrice对应比例（复杂，按original持有人逻辑）
+  // 这里假设客户是original持有人或简化计算
+  const demandGet = faceValue + demandInterest;
+  const demandLoss = faceValue * cdRateDec * nowHoldDays / 365 - demandInterest;
+
+  // 方案B：转让卖出
+  const transferPrice = (faceValue * (cdRateDec * 3 + 1)) / (listRateDec * remainDays / 365 + 1);
+  const transferIncome = transferPrice - buyPrice;
+  const transferTotal = transferPrice;
+
+  // 已产生利息（按原利率）
+  const accruedInterest = faceValue * cdRateDec * nowHoldDays / 365;
+
+  const better = transferTotal > demandGet ? 'transfer' : 'demand';
+  const diff = Math.abs(transferTotal - demandGet);
+
+  const summaryEl = document.getElementById('ew-summary');
+  summaryEl.innerHTML = `
+    <div class="big-label">方案对比结果</div>
+    <div class="big-number" style="font-size:22px;">${better === 'transfer' ? '转让卖出' : '提前支取'}</div>
+    <div class="big-desc">两方案差额约 ¥${fmtMoney(diff)}，具体选择需结合客户资金流动性需求</div>
+  `;
+
+  const resultsEl = document.getElementById('ew-results');
+  resultsEl.innerHTML = `
+    <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:8px;">方案A：提前支取（按活期）</div>
+    <div class="result-card warn">
+      <span class="result-card-label">可拿回金额</span>
+      <span class="result-card-value">¥${fmtMoney(demandGet)}</span>
+    </div>
+    <div class="result-card warn">
+      <span class="result-card-label">利息损失</span>
+      <span class="result-card-value negative">-¥${fmtMoney(demandLoss)}</span>
+    </div>
+    <div style="font-size:13px;font-weight:700;color:var(--primary);margin:14px 0 8px;">方案B：转让卖出</div>
+    <div class="result-card highlight">
+      <span class="result-card-label">预计转让价</span>
+      <span class="result-card-value">¥${fmtMoney(transferPrice)}</span>
+    </div>
+    <div class="result-card highlight">
+      <span class="result-card-label">转让收益</span>
+      <span class="result-card-value positive">+¥${fmtMoney(transferIncome)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-card-label"><strong>差额对比</strong></span>
+      <span class="result-card-value ${better === 'transfer' ? 'positive' : 'negative'}"><strong>${better === 'transfer' ? '+' : ''}¥${fmtMoney(diff)}</strong></span>
+    </div>
+  `;
+
+  const maxVal = Math.max(demandGet, transferPrice, faceValue);
+  const chartEl = document.getElementById('ew-chart');
+  chartEl.innerHTML = `
+    <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">到手金额对比</div>
+    <div class="chart-row">
+      <div class="chart-label">提前支取</div>
+      <div class="chart-bar-wrap">
+        <div class="chart-bar bar-c" style="width:${(demandGet/maxVal*100).toFixed(1)}%">¥${fmtMoney(demandGet)}</div>
+      </div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-label">转让卖出</div>
+      <div class="chart-bar-wrap">
+        <div class="chart-bar bar-b" style="width:${(transferPrice/maxVal*100).toFixed(1)}%">¥${fmtMoney(transferPrice)}</div>
+      </div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-label">存单面值</div>
+      <div class="chart-bar-wrap">
+        <div class="chart-bar bar-a" style="width:${(faceValue/maxVal*100).toFixed(1)}%">¥${fmtMoney(faceValue)}</div>
+      </div>
+    </div>
+  `;
+
+  const scriptEl = document.getElementById('ew-script');
+  scriptEl.textContent = generateEarlyScript({
+    faceValue, cdRate, nowHoldDays, buyPrice, listRate, demandRate,
+    demandGet, demandLoss, transferPrice, transferIncome, better, diff, accruedInterest
+  });
+
+  setStep('early', 3);
+  showToast('对比完成！');
+}
+
+// ========================
+// 沟通建议生成
+// ========================
+function generateRateCutScript(data) {
+  const {
+    faceValue, cdRate, nowHoldDays, listRate, buyPrice, planHoldDays,
+    transferPrice, convertRate, accruedInterest, holdIncome, isPremium, remainDays
+  } = data;
+
+  return `【降息转让 · 客户沟通参考】
+
+"张总/李姐，您看啊，央行又降息了，现在新发行的大额存单利率已经降到${listRate}%了。
+
+但您手里这张${cdRate}%的存单，因为是之前买的，利率高啊，现在市场上这种'老存单'可值钱了。
+
+我帮您算了一下：
+· 您的存单面值是${fmtMoney(faceValue)}元
+· 已经持有了${Math.round(nowHoldDays)}天，已经产生了${fmtMoney(accruedInterest)}元的利息
+· 如果现在就转让，预计能卖到${fmtMoney(transferPrice)}元
+· 您这段时间的实际年化收益大约是${convertRate.toFixed(2)}%
+
+${isPremium ? `关键就在这：因为市场利率降了，您的老存单有${fmtMoney(holdIncome)}元的溢价空间。` : '当前市场利率和您的存单利率接近，转让主要以流动性需求为主。'}
+
+简单讲：降息对您反而是好事，高息存单更抢手了。您要是近期有资金安排，转让出去比提前支取划算得多。"
+
+【关键卖点】
+1. 央行降息 → 老存单更值钱（稀缺性）
+2. 转让价格高于面值（价差空间）
+3. 持有期折算利率约 ${convertRate.toFixed(2)}%（高于当前市场利率）`;
+}
+
+function generateHolidayScript(data) {
+  const { holidayName, days, amount, cdRate, compareRate, cdIncome, compareIncome, extraIncome, dailyBoost } = data;
+
+  return `【假日资金泊车 · 客户沟通参考】
+
+"张总/李姐，马上${holidayName}了，跟您说个不少客户都在用的'假日泊车'小技巧。
+
+您知道假期股票休市、大部分理财也不确认份额，钱躺在账户里那几天是白放的，基本没利息。
+
+但大额存单不一样——它是按日计息的！假期每一天都在给您生钱。
+
+我帮您算了一笔账：
+· 如果您有${fmtMoney(amount)}元闲钱
+· ${holidayName}共${Math.round(days)}天
+· 买咱们${cdRate}%的大额存单，假期能挣${fmtMoney(cdIncome)}元
+· 要是放活期或者货币基金（约${compareRate}%），只能挣${fmtMoney(compareIncome)}元
+· 收益差额为${fmtMoney(extraIncome)}元
+
+${Math.round(days)}天收益差额为${fmtMoney(extraIncome)}，节后存单可通过转让区卖出回笼资金。
+
+等于说假期您的钱在'加班'，别人在放假。"`;
+}
+
+function generateEarlyScript(data) {
+  const { faceValue, cdRate, nowHoldDays, listRate, demandRate, demandGet, demandLoss, transferPrice, transferIncome, better, diff, accruedInterest } = data;
+
+  const recommend = better === 'transfer'
+    ? `转让卖出预计比提前支取多拿回${fmtMoney(diff)}元，但最终能否成交取决于转让区流动性，资金急用当天必须到账的，提前支取更稳妥。`
+    : `当前市场利率与存单利率差距较小，转让卖出与提前支取的收益差距不大，可根据客户资金急用程度和转让区成交情况综合判断。`;
+
+  return `【提前用款方案对比 · 客户沟通参考】
+
+"张总/李姐，您急用钱的心情我理解。我帮您把两种方案都算了一下，咱们看哪个更划算：
+
+【方案一：提前支取】
+· 银行按活期利率${demandRate}%给您结算
+· 您已经持有了${Math.round(nowHoldDays)}天，按原利率应该产生${fmtMoney(accruedInterest)}元利息
+· 但提前支取只能拿到${fmtMoney(demandGet)}元
+· 相当于利息损失了${fmtMoney(demandLoss)}元
+
+【方案二：转让卖出】
+· 把存单挂到转让区，让下家接盘
+· 当前市场新存单利率是${listRate}%
+· 预计转让价格约${fmtMoney(transferPrice)}元
+· 转让收益约${fmtMoney(transferIncome)}元
+
+【结论】
+${recommend}
+
+转让的好处是：您不用损失利息，下家买走之后您立刻拿到钱。而且现在转让都是线上操作，几分钟就能挂单。"
+
+【注意提醒客户】
+转让需要有人接盘，如果市场流动性不好可能需要等待。如果资金当天必须到账，提前支取是更稳妥的选择。`;
+}
+
+// ========================
+// 工具函数
+// ========================
+function fmtMoney(n) {
+  return n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+function copyScript(id) {
+  showToast('内容仅供内部学习参考，请结合实际情况与客户沟通');
+}
+
+// ========================
+// 术语弹窗
+// ========================
+const helpData = {
+  faceValue: { title: '存单面值', body: '存单到期时银行返还的本金金额。大额存单一般20万元起购，常见面值有20万、30万、50万、100万等。' },
+  cdRate: { title: '存单利率', body: '存单发行时约定的年化利率。例如2.65%表示每年按本金的2.65%计息。老存单通常比新存单利率高。' },
+  holdDays: { title: '已持有天数', body: '从存单生效日（起息日）到今天一共经过了多少天。可以在手机银行"我的存单"里查看起息日。' },
+  listRate: { title: '挂牌利率', body: '当前市场上新发行同期限大额存单的利率。央行降息后，挂牌利率会下调，导致老存单（高利率）变得更有价值。' },
+  buyPrice: { title: '购买价格', body: '您买入这张存单时实际花了多少钱。如果您是original持有人（在银行首发时购买），购买价格=存单面值。如果您是从转让区买别人的二手存单，购买价格可能高于或低于面值。' },
+  planHoldDays: { title: '计划持有天数', body: '您打算继续持有这张存单多长时间后再转让。持有时间越长，累积的利息越多，但市场利率变化的不确定性也越大。' }
+};
+
+function showHelp(key) {
+  const data = helpData[key];
+  if (!data) return;
+  document.getElementById('help-title').textContent = data.title;
+  document.getElementById('help-body').textContent = data.body;
+  document.getElementById('help-modal').classList.add('show');
+}
+
+function hideHelp() {
+  document.getElementById('help-modal').classList.remove('show');
+}
+
+function showGlossary() {
+  document.getElementById('glossary-modal').classList.add('show');
+}
+
+function hideGlossary() {
+  document.getElementById('glossary-modal').classList.remove('show');
+}
+
+function closeModal(e) {
+  if (e.target.classList.contains('modal')) {
+    e.target.classList.remove('show');
+  }
+}
+
+// ========================
+// 输入交互增强
+// ========================
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('input').forEach(input => {
     input.addEventListener('input', function() {
-        this.classList.remove('error');
+      this.classList.remove('error');
     });
-    
-    // 回车键触发计算
     input.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            calculate();
-        }
+      if (e.key === 'Enter') {
+        // 找到当前活跃的wizard和step，尝试下一步
+        const panel = this.closest('.step-panel');
+        if (!panel) return;
+        const wizard = panel.closest('.wizard');
+        if (!wizard) return;
+        const scene = wizard.id.replace('wizard-', '');
+        nextStep(scene);
+      }
     });
+  });
 });
 
-// 页面加载完成后的欢迎提示
-window.addEventListener('load', () => {
-    setTimeout(() => {
-        showToast('欢迎使用大额存单计算器！');
-    }, 500);
-});
 </script>
-
 </body>
 </html>
