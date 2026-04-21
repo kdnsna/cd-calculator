@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#0d47a1" />
   <title>大额存单智慧计算器 · 场景版</title>
-<style>
+  <style>
 /* ============================================
    大额存单智慧计算器 - 全局样式
    ============================================ */
@@ -747,14 +747,14 @@ input[readonly] {
         <p class="hero-desc">选对场景，一分钟讲明白收益逻辑</p>
       </div>
       <div class="scene-list">
-        <div class="scene-card" onclick="goScene('rateCut')">
-          <div class="scene-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">📉</div>
+        <div class="scene-card" onclick="goScene('transfer')">
+          <div class="scene-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">📊</div>
           <div class="scene-content">
-            <h3>降息转让利差</h3>
-            <p>市场利率下行后，高息老存单在转让市场存在价差空间</p>
+            <h3>存单转让价差分析</h3>
+            <p>输入转让报价，反推下家收益率；或输入市场利率，算推荐转让价</p>
             <div class="scene-tags">
-              <span class="tag">利率调整</span>
-              <span class="tag">利差收益</span>
+              <span class="tag">双向验价</span>
+              <span class="tag">买卖参考</span>
             </div>
           </div>
           <div class="scene-arrow">›</div>
@@ -763,7 +763,7 @@ input[readonly] {
           <div class="scene-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">🏖️</div>
           <div class="scene-content">
             <h3>假日资金泊车</h3>
-            <p>节假日理财/股票不记息，大额存单按日计息，假期也能持续生息</p>
+            <p>输入假期起止日期自动算天数，对比大额存单与活期/货基收益</p>
             <div class="scene-tags">
               <span class="tag">假期生息</span>
               <span class="tag">时点冲刺</span>
@@ -775,10 +775,10 @@ input[readonly] {
           <div class="scene-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">💸</div>
           <div class="scene-content">
             <h3>提前用款方案</h3>
-            <p>急用钱时，对比"提前支取（按活期）"vs"转让卖出"哪个更划算</p>
+            <p>急用钱时，对比"提前支取（按活期）"vs"转让卖出"的参考差异</p>
             <div class="scene-tags">
               <span class="tag">急用资金</span>
-              <span class="tag">最优方案</span>
+              <span class="tag">方案参考</span>
             </div>
           </div>
           <div class="scene-arrow">›</div>
@@ -789,26 +789,23 @@ input[readonly] {
       </div>
     </div>
 
-    <!-- 场景页：降息转让 -->
-    <div id="page-rateCut" class="page">
+    <!-- 场景页：存单转让价差分析 -->
+    <div id="page-transfer" class="page">
       <div class="page-header">
         <button class="btn-back" onclick="goHome()">‹ 返回</button>
-        <h2>降息转让利差</h2>
+        <h2>存单转让价差分析</h2>
       </div>
-      <div class="wizard" id="wizard-rateCut">
+      <div class="wizard" id="wizard-transfer">
         <div class="wizard-steps">
           <div class="step-dot active" data-step="1"></div>
           <div class="step-line"></div>
           <div class="step-dot" data-step="2"></div>
           <div class="step-line"></div>
           <div class="step-dot" data-step="3"></div>
-          <div class="step-line"></div>
-          <div class="step-dot" data-step="4"></div>
         </div>
         <div class="step-labels">
           <span>存单信息</span>
-          <span>市场利率</span>
-          <span>持有计划</span>
+          <span>转让报价</span>
           <span>查看结果</span>
         </div>
 
@@ -817,7 +814,8 @@ input[readonly] {
           <div class="panel-title">第一步：录入存单基本信息</div>
           <div class="preset-bar">
             <span>快速体验：</span>
-            <button class="chip" onclick="loadPreset('rateCut','case1')">案例：20万·2.65%·已持180天</button>
+            <button class="chip" onclick="loadPreset('transfer','case1')">案例：20万·1.75%·已持141天</button>
+            <button class="chip" onclick="loadPreset('transfer','case2')">验算：100万·1.75%·剩余1019天</button>
           </div>
           <div class="form-group">
             <label>
@@ -825,7 +823,7 @@ input[readonly] {
               <span class="help-trigger" onclick="showHelp('faceValue')">?</span>
             </label>
             <div class="input-wrap">
-              <input type="number" id="rc-faceValue" placeholder="如 200000" step="10000" />
+              <input type="number" id="tr-faceValue" placeholder="如 200000" step="10000" />
               <span class="input-unit">元</span>
             </div>
             <div class="input-hint">存单上写的本金金额，最低20万起</div>
@@ -836,10 +834,21 @@ input[readonly] {
               <span class="help-trigger" onclick="showHelp('cdRate')">?</span>
             </label>
             <div class="input-wrap">
-              <input type="number" id="rc-cdRate" placeholder="如 2.65" step="0.01" />
+              <input type="number" id="tr-cdRate" placeholder="如 1.75" step="0.01" />
               <span class="input-unit">%</span>
             </div>
-            <div class="input-hint">存单发行时的约定利率，老存单通常更高</div>
+            <div class="input-hint">存单发行时的约定利率</div>
+          </div>
+          <div class="form-group">
+            <label>
+              买入价格（实际花费）
+              <span class="help-trigger" onclick="showHelp('buyPrice')">?</span>
+            </label>
+            <div class="input-wrap">
+              <input type="number" id="tr-buyPrice" placeholder="如 200000" step="100" />
+              <span class="input-unit">元</span>
+            </div>
+            <div class="input-hint">original 持有人填面值，二手买家填实际买入价</div>
           </div>
           <div class="form-group">
             <label>
@@ -847,90 +856,94 @@ input[readonly] {
               <span class="help-trigger" onclick="showHelp('holdDays')">?</span>
             </label>
             <div class="input-wrap">
-              <input type="number" id="rc-nowHoldDays" placeholder="如 180" step="1" />
+              <input type="number" id="tr-nowHoldDays" placeholder="如 141" step="1" oninput="syncHoldDays('now')" />
               <span class="input-unit">天</span>
             </div>
             <div class="input-hint">从存单生效到今天一共多少天</div>
           </div>
-          <button class="btn-primary" onclick="nextStep('rateCut')">下一步：填写市场利率 ›</button>
+          <div class="form-group">
+            <label>
+              剩余期限（到到期日）
+              <span class="help-trigger" onclick="showHelp('remainDays')">?</span>
+            </label>
+            <div class="input-wrap">
+              <input type="number" id="tr-remainDays" placeholder="如 954" step="1" oninput="syncHoldDays('remain')" />
+              <span class="input-unit">天</span>
+            </div>
+            <div class="input-hint">从现在到存单到期还有多少天（填此项可自动算出已持有天数）</div>
+          </div>
+          <button class="btn-primary" onclick="nextStep('transfer')">下一步：填写转让报价 ›</button>
         </div>
 
-        <!-- Step 2: 市场利率 -->
+        <!-- Step 2: 转让报价 -->
         <div class="step-panel" data-step="2">
-          <div class="panel-title">第二步：当前市场挂牌利率</div>
+          <div class="panel-title">第二步：转让报价或市场利率（至少填一项）</div>
           <div class="info-box">
-            <strong>为什么要填这个？</strong><br/>
-            央行降息后，新发行的大额存单利率会下调。您手中高利率的"老存单"在市场上就值钱了——下家愿意溢价买走。
+            <strong>两种用法：</strong><br/>
+            1. 输入<strong>转让报价</strong> → 反推下家接盘后的收益率<br/>
+            2. 输入<strong>市场利率</strong> → 算推荐转让价
           </div>
+          <div class="form-group">
+            <label>
+              计划再持有多长时间后转让
+              <span class="help-trigger" onclick="showHelp('planHoldDays')">?</span>
+            </label>
+            <div class="quick-days">
+              <button class="day-chip" onclick="setDays('tr-planHoldDays',0)">立刻转让</button>
+              <button class="day-chip" onclick="setDays('tr-planHoldDays',90)">3个月</button>
+              <button class="day-chip" onclick="setDays('tr-planHoldDays',180)">6个月</button>
+              <button class="day-chip" onclick="setDays('tr-planHoldDays',365)">1年</button>
+            </div>
+            <div class="input-wrap">
+              <input type="number" id="tr-planHoldDays" placeholder="如 0（立刻转让）" step="1" />
+              <span class="input-unit">天</span>
+            </div>
+            <div class="input-hint">0 表示现在立刻转让，持有时间越长剩余期限越短</div>
+          </div>
+          <div class="form-group">
+            <label>
+              转让报价（您想挂的价格）
+              <span class="help-trigger" onclick="showHelp('transferPrice')">?</span>
+            </label>
+            <div class="input-wrap">
+              <input type="number" id="tr-transferPrice" placeholder="如 201450" step="100" />
+              <span class="input-unit">元</span>
+            </div>
+            <div class="input-hint">客户在转让区挂单的价格，高于面值即溢价</div>
+          </div>
+          <div style="text-align:center;color:#90a4ae;font-size:13px;margin:12px 0;">— 或 —</div>
           <div class="form-group">
             <label>
               当前市场挂牌利率（新存单利率）
               <span class="help-trigger" onclick="showHelp('listRate')">?</span>
             </label>
             <div class="input-wrap">
-              <input type="number" id="rc-listRate" placeholder="如 2.15" step="0.01" />
+              <input type="number" id="tr-listRate" placeholder="如 1.72" step="0.01" />
               <span class="input-unit">%</span>
             </div>
-            <div class="input-hint">现在银行新卖的同期限存单利率，通常比老存单低</div>
-          </div>
-          <div class="form-group">
-            <label>
-              您的购买价格（买入时花了多少）
-              <span class="help-trigger" onclick="showHelp('buyPrice')">?</span>
-            </label>
-            <div class="input-wrap">
-              <input type="number" id="rc-buyPrice" placeholder="如 195000" step="100" />
-              <span class="input-unit">元</span>
-            </div>
-            <div class="input-hint">如果您是 original 持有人，填存单面值即可</div>
+            <div class="input-hint">当前银行新卖的同期限存单利率</div>
           </div>
           <div class="btn-row">
-            <button class="btn-secondary" onclick="prevStep('rateCut')">‹ 上一步</button>
-            <button class="btn-primary" onclick="nextStep('rateCut')">下一步：持有计划 ›</button>
+            <button class="btn-secondary" onclick="prevStep('transfer')">‹ 上一步</button>
+            <button class="btn-primary btn-glow" onclick="calcTransfer()">立即计算 ›</button>
           </div>
         </div>
 
-        <!-- Step 3: 持有计划 -->
+        <!-- Step 3: 结果 -->
         <div class="step-panel" data-step="3">
-          <div class="panel-title">第三步：您打算持有多久？</div>
-          <div class="form-group">
-            <label>
-              计划再持有多长时间
-              <span class="help-trigger" onclick="showHelp('planHoldDays')">?</span>
-            </label>
-            <div class="quick-days">
-              <button class="day-chip" onclick="setDays('rc-planHoldDays',30)">1个月</button>
-              <button class="day-chip" onclick="setDays('rc-planHoldDays',90)">3个月</button>
-              <button class="day-chip" onclick="setDays('rc-planHoldDays',180)">6个月</button>
-              <button class="day-chip" onclick="setDays('rc-planHoldDays',365)">1年</button>
-            </div>
-            <div class="input-wrap">
-              <input type="number" id="rc-planHoldDays" placeholder="如 365" step="1" />
-              <span class="input-unit">天</span>
-            </div>
-            <div class="input-hint">持有时间越长，转让溢价通常越高</div>
-          </div>
-          <div class="btn-row">
-            <button class="btn-secondary" onclick="prevStep('rateCut')">‹ 上一步</button>
-            <button class="btn-primary btn-glow" onclick="calcRateCut()">立即计算 ›</button>
-          </div>
-        </div>
-
-        <!-- Step 4: 结果 -->
-        <div class="step-panel" data-step="4">
           <div class="panel-title">计算结果</div>
-          <div class="result-summary" id="rc-summary"></div>
-          <div class="result-cards" id="rc-results"></div>
-          <div class="comparison-chart" id="rc-chart"></div>
+          <div class="result-summary" id="tr-summary"></div>
+          <div class="result-cards" id="tr-results"></div>
+          <div class="comparison-chart" id="tr-chart"></div>
           <div class="script-box">
             <div class="script-header">
               <span>客户沟通参考</span>
             </div>
             <div class="disclaimer">以下内容仅供客户经理内部学习参考，不代表银行承诺或保证，具体以实际产品条款为准。</div>
-            <div class="script-body" id="rc-script"></div>
+            <div class="script-body" id="tr-script"></div>
           </div>
           <div class="btn-row">
-            <button class="btn-secondary" onclick="resetWizard('rateCut')">重新计算</button>
+            <button class="btn-secondary" onclick="resetWizard('transfer')">重新计算</button>
             <button class="btn-primary" onclick="goHome()">返回首页</button>
           </div>
         </div>
@@ -952,53 +965,33 @@ input[readonly] {
           <div class="step-dot" data-step="3"></div>
         </div>
         <div class="step-labels">
-          <span>选择假期</span>
+          <span>假期日期</span>
           <span>资金信息</span>
           <span>查看结果</span>
         </div>
 
-        <!-- Step 1: 选择假期 -->
+        <!-- Step 1: 假期日期 -->
         <div class="step-panel active" data-step="1">
-          <div class="panel-title">第一步：选择即将到来的假期</div>
+          <div class="panel-title">第一步：输入假期起止日期</div>
           <div class="info-box">
-            节假日期间，股票休市、大部分T+0理财不确认份额，资金处于"空转"状态。大额存单<strong>按日计息</strong>，假期每一天都在生息。
+            输入假期的<strong>开始日期</strong>和<strong>结束日期</strong>，系统自动计算假期天数。也可直接手动输入天数。
           </div>
-          <div class="holiday-grid">
-            <div class="holiday-card" onclick="selectHoliday(this,'春节',8,2.1)">
-              <div class="holiday-emoji">🧧</div>
-              <div class="holiday-name">春节长假</div>
-              <div class="holiday-info">约 7-10 天</div>
-            </div>
-            <div class="holiday-card" onclick="selectHoliday(this,'国庆',7,2.1)">
-              <div class="holiday-emoji">🇨🇳</div>
-              <div class="holiday-name">国庆长假</div>
-              <div class="holiday-info">约 7 天</div>
-            </div>
-            <div class="holiday-card" onclick="selectHoliday(this,'五一',5,2.1)">
-              <div class="holiday-emoji">🎉</div>
-              <div class="holiday-name">五一假期</div>
-              <div class="holiday-info">约 3-5 天</div>
-            </div>
-            <div class="holiday-card" onclick="selectHoliday(this,'清明/端午/中秋',3,2.1)">
-              <div class="holiday-emoji">🌿</div>
-              <div class="holiday-name">小长假</div>
-              <div class="holiday-info">约 3 天</div>
-            </div>
-            <div class="holiday-card" onclick="selectHoliday(this,'元旦',3,2.1)">
-              <div class="holiday-emoji">🎆</div>
-              <div class="holiday-name">元旦假期</div>
-              <div class="holiday-info">约 3 天</div>
-            </div>
-            <div class="holiday-card" onclick="selectHoliday(this,'自定义',0,2.1)">
-              <div class="holiday-emoji">📅</div>
-              <div class="holiday-name">自定义天数</div>
-              <div class="holiday-info">手动输入</div>
-            </div>
-          </div>
-          <div id="holiday-custom-wrap" class="form-group hidden" style="margin-top:12px;">
-            <label>自定义假期天数</label>
+          <div class="form-group">
+            <label>假期开始日期</label>
             <div class="input-wrap">
-              <input type="number" id="hl-customDays" placeholder="如 5" step="1" />
+              <input type="date" id="hl-startDate" onchange="calcHolidayDays()" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>假期结束日期</label>
+            <div class="input-wrap">
+              <input type="date" id="hl-endDate" onchange="calcHolidayDays()" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>假期天数（自动计算，也可手动修改）</label>
+            <div class="input-wrap">
+              <input type="number" id="hl-days" placeholder="如 7" step="1" />
               <span class="input-unit">天</span>
             </div>
           </div>
@@ -1010,7 +1003,7 @@ input[readonly] {
           <div class="panel-title">第二步：填写资金与利率信息</div>
           <div class="preset-bar">
             <span>快速体验：</span>
-            <button class="chip" onclick="loadPreset('holiday','case1')">100万·2.1%·国庆7天</button>
+            <button class="chip" onclick="loadPreset('holiday','case1')">100万·2.1%·7天</button>
           </div>
           <div class="form-group">
             <label>假期可用资金金额</label>
@@ -1027,13 +1020,6 @@ input[readonly] {
               <span class="input-unit">%</span>
             </div>
             <div class="input-hint">当前在售大额存单利率</div>
-          </div>
-          <div class="form-group">
-            <label>假期天数（已自动填入）</label>
-            <div class="input-wrap">
-              <input type="number" id="hl-days" placeholder="如 7" step="1" readonly />
-              <span class="input-unit">天</span>
-            </div>
           </div>
           <div class="form-group">
             <label>对比：活期利率 / 货币基金利率（可选）</label>
@@ -1074,7 +1060,7 @@ input[readonly] {
     <div id="page-early" class="page">
       <div class="page-header">
         <button class="btn-back" onclick="goHome()">‹ 返回</button>
-        <h2>提前用款方案对比</h2>
+        <h2>提前用款方案</h2>
       </div>
       <div class="wizard" id="wizard-early">
         <div class="wizard-steps">
@@ -1202,7 +1188,7 @@ input[readonly] {
         <div class="modal-body">
           <div class="glossary-item">
             <div class="glossary-term">存单面值</div>
-            <div class="glossary-def">存单到期时银行返还的本金金额，大额存单一般20万起。</div>
+            <div class="glossary-def">存单到期时银行返还的本金金额，大额存单一般20万元起。</div>
           </div>
           <div class="glossary-item">
             <div class="glossary-term">存单利率</div>
@@ -1213,12 +1199,12 @@ input[readonly] {
             <div class="glossary-def">当前市场上新发行同期限存单的利率，通常随央行降息而下调。</div>
           </div>
           <div class="glossary-item">
-            <div class="glossary-term">转让价格</div>
-            <div class="glossary-def">把存单卖给下家时的成交价。老存单利率高于市场利率时，转让价通常高于面值（溢价）。</div>
+            <div class="glossary-term">转让报价</div>
+            <div class="glossary-def">客户在转让区挂单的价格，高于面值即溢价，低于面值即折价。</div>
           </div>
           <div class="glossary-item">
             <div class="glossary-term">折算利率</div>
-            <div class="glossary-def">您持有这段时间的实际年化收益率，考虑了买入价和卖出价的差额。</div>
+            <div class="glossary-def">持有期间的实际年化收益率，考虑了买入价和卖出价的差额。</div>
           </div>
           <div class="glossary-item">
             <div class="glossary-term">提前支取</div>
@@ -1234,18 +1220,18 @@ input[readonly] {
   </div>
 
   <div id="toast" class="toast"></div>
-<script>
+  <script>
 /**
  * 大额存单智慧计算器 - 核心逻辑
- * 场景：降息转让 / 假日泊车 / 提前用款
+ * 场景：存单转让价差分析 / 假日资金泊车 / 提前用款
  */
 
 // ========================
 // 状态管理
 // ========================
 const state = {
-  rateCut: { step: 1, maxStep: 4 },
-  holiday: { step: 1, maxStep: 3, selectedHoliday: null },
+  transfer: { step: 1, maxStep: 3 },
+  holiday: { step: 1, maxStep: 3 },
   early: { step: 1, maxStep: 3 }
 };
 
@@ -1272,13 +1258,11 @@ function setStep(scene, step) {
   const s = state[scene];
   s.step = step;
 
-  // 更新向导圆点
   const wizard = document.getElementById('wizard-' + scene);
   wizard.querySelectorAll('.step-dot').forEach((dot, idx) => {
     dot.classList.toggle('active', idx + 1 === step);
   });
 
-  // 更新面板
   wizard.querySelectorAll('.step-panel').forEach(panel => {
     panel.classList.toggle('active', parseInt(panel.dataset.step) === step);
   });
@@ -1304,18 +1288,11 @@ function prevStep(scene) {
 
 function resetWizard(scene) {
   state[scene].step = 1;
-  // 清除输入
   const page = document.getElementById('page-' + scene);
   page.querySelectorAll('input').forEach(input => {
     input.value = '';
     input.classList.remove('error');
   });
-  // 清除假日选择
-  if (scene === 'holiday') {
-    state.holiday.selectedHoliday = null;
-    page.querySelectorAll('.holiday-card').forEach(c => c.classList.remove('active'));
-    document.getElementById('holiday-custom-wrap').classList.add('hidden');
-  }
   setStep(scene, 1);
 }
 
@@ -1323,10 +1300,10 @@ function resetWizard(scene) {
 // 步骤验证
 // ========================
 function validateStep(scene, step) {
-  const getVal = (id) => {
+  const getVal = (id, required = true) => {
     const el = document.getElementById(id);
     const v = parseFloat(el.value);
-    if (el.value === '' || isNaN(v) || v < 0) {
+    if (required && (el.value === '' || isNaN(v) || v < 0)) {
       el.classList.add('error');
       el.focus();
       showToast('请填写有效数值');
@@ -1336,40 +1313,34 @@ function validateStep(scene, step) {
     return v;
   };
 
-  if (scene === 'rateCut') {
+  if (scene === 'transfer') {
     if (step === 1) {
-      if (getVal('rc-faceValue') === null) return false;
-      if (getVal('rc-cdRate') === null) return false;
-      if (getVal('rc-nowHoldDays') === null) return false;
+      if (getVal('tr-faceValue') === null) return false;
+      if (getVal('tr-cdRate') === null) return false;
+      if (getVal('tr-buyPrice') === null) return false;
+      if (getVal('tr-nowHoldDays') === null) return false;
     }
     if (step === 2) {
-      if (getVal('rc-listRate') === null) return false;
-      if (getVal('rc-buyPrice') === null) return false;
-    }
-    if (step === 3) {
-      const d = getVal('rc-planHoldDays');
-      if (d === null) return false;
-      const now = parseFloat(document.getElementById('rc-nowHoldDays').value) || 0;
-      if (now + d >= 365 * 3) {
-        showToast('持有天数总和不能超过3年');
-        document.getElementById('rc-planHoldDays').classList.add('error');
+      const tp = document.getElementById('tr-transferPrice').value;
+      const lr = document.getElementById('tr-listRate').value;
+      if (tp === '' && lr === '') {
+        showToast('请至少填写转让报价或市场利率其中一项');
+        document.getElementById('tr-transferPrice').classList.add('error');
         return false;
       }
+      document.getElementById('tr-transferPrice').classList.remove('error');
     }
   }
 
   if (scene === 'holiday') {
     if (step === 1) {
-      const h = state.holiday.selectedHoliday;
-      if (!h) {
-        showToast('请先选择一个假期');
+      const days = document.getElementById('hl-days').value;
+      if (days === '' || parseFloat(days) <= 0) {
+        showToast('请填写假期天数');
+        document.getElementById('hl-days').classList.add('error');
         return false;
       }
-      if (h.name === '自定义') {
-        const d = getVal('hl-customDays');
-        if (d === null) return false;
-        h.days = d;
-      }
+      document.getElementById('hl-days').classList.remove('error');
     }
     if (step === 2) {
       if (getVal('hl-amount') === null) return false;
@@ -1396,11 +1367,12 @@ function validateStep(scene, step) {
 // 预设案例加载
 // ========================
 const presets = {
-  rateCut: {
-    case1: { faceValue: 200000, cdRate: 2.65, nowHoldDays: 180, listRate: 2.15, buyPrice: 200000, planHoldDays: 365 }
+  transfer: {
+    case1: { faceValue: 200000, cdRate: 1.75, nowHoldDays: 141, buyPrice: 200000 },
+    case2: { faceValue: 1000000, cdRate: 1.75, nowHoldDays: 76, buyPrice: 1004000 }
   },
   holiday: {
-    case1: { amount: 1000000, cdRate: 2.1, days: 7, compareRate: 0.25, holidayName: '国庆长假' }
+    case1: { amount: 1000000, cdRate: 2.1, days: 7, compareRate: 0.25 }
   },
   early: {
     case1: { faceValue: 500000, cdRate: 2.8, nowHoldDays: 365, buyPrice: 500000, listRate: 2.1, demandRate: 0.25 }
@@ -1411,25 +1383,18 @@ function loadPreset(scene, caseKey) {
   const p = presets[scene][caseKey];
   if (!p) return;
 
-  if (scene === 'rateCut') {
-    document.getElementById('rc-faceValue').value = p.faceValue;
-    document.getElementById('rc-cdRate').value = p.cdRate;
-    document.getElementById('rc-nowHoldDays').value = p.nowHoldDays;
-    document.getElementById('rc-listRate').value = p.listRate;
-    document.getElementById('rc-buyPrice').value = p.buyPrice;
-    document.getElementById('rc-planHoldDays').value = p.planHoldDays;
+  if (scene === 'transfer') {
+    document.getElementById('tr-faceValue').value = p.faceValue;
+    document.getElementById('tr-cdRate').value = p.cdRate;
+    document.getElementById('tr-buyPrice').value = p.buyPrice;
+    document.getElementById('tr-nowHoldDays').value = p.nowHoldDays;
+    syncHoldDays('now');
   }
   if (scene === 'holiday') {
     document.getElementById('hl-amount').value = p.amount;
     document.getElementById('hl-cdRate').value = p.cdRate;
     document.getElementById('hl-days').value = p.days;
     document.getElementById('hl-compareRate').value = p.compareRate;
-    // 选中对应假日卡片
-    document.querySelectorAll('#page-holiday .holiday-card').forEach(card => {
-      if (card.querySelector('.holiday-name').textContent === p.holidayName) {
-        selectHoliday(card, p.holidayName, p.days, p.cdRate);
-      }
-    });
   }
   if (scene === 'early') {
     document.getElementById('ew-faceValue').value = p.faceValue;
@@ -1444,83 +1409,155 @@ function loadPreset(scene, caseKey) {
 }
 
 // ========================
-// 假日选择
+// 假日天数自动计算
 // ========================
-function selectHoliday(card, name, days, rate) {
-  document.querySelectorAll('#page-holiday .holiday-card').forEach(c => c.classList.remove('active'));
-  card.classList.add('active');
+function calcHolidayDays() {
+  const start = document.getElementById('hl-startDate').value;
+  const end = document.getElementById('hl-endDate').value;
+  if (start && end) {
+    const s = new Date(start);
+    const e = new Date(end);
+    const diff = Math.round((e - s) / (1000 * 60 * 60 * 24));
+    if (diff >= 0) {
+      document.getElementById('hl-days').value = diff + 1; // 包含首尾两天
+    }
+  }
+}
 
-  const customWrap = document.getElementById('holiday-custom-wrap');
-  if (name === '自定义') {
-    customWrap.classList.remove('hidden');
-    state.holiday.selectedHoliday = { name, days: 0, rate };
+// ========================
+// 已持有天数与剩余期限联动
+// ========================
+function syncHoldDays(source) {
+  const totalDays = 365 * 3 + 1;
+  const nowEl = document.getElementById('tr-nowHoldDays');
+  const remainEl = document.getElementById('tr-remainDays');
+  if (source === 'now') {
+    const d = parseFloat(nowEl.value);
+    if (!isNaN(d) && d >= 0 && d <= totalDays) {
+      remainEl.value = Math.round(totalDays - d);
+    }
   } else {
-    customWrap.classList.add('hidden');
-    document.getElementById('hl-days').value = days;
-    state.holiday.selectedHoliday = { name, days, rate };
-  }
-}
-
-function setDays(inputId, days) {
-  document.getElementById(inputId).value = days;
-  // 高亮选中
-  const wrap = document.getElementById(inputId).closest('.form-group');
-  if (wrap) {
-    wrap.querySelectorAll('.day-chip').forEach(chip => {
-      chip.classList.toggle('active', chip.textContent.includes(days === 30 ? '1个月' : days === 90 ? '3个月' : days === 180 ? '6个月' : '1年'));
-    });
+    const d = parseFloat(remainEl.value);
+    if (!isNaN(d) && d >= 0 && d <= totalDays) {
+      nowEl.value = Math.round(totalDays - d);
+    }
   }
 }
 
 // ========================
-// 计算核心 - 降息转让
+// 计算核心 - 存单转让价差分析
 // ========================
-function calcRateCut() {
-  const faceValue = parseFloat(document.getElementById('rc-faceValue').value);
-  const cdRate = parseFloat(document.getElementById('rc-cdRate').value);
-  const nowHoldDays = parseFloat(document.getElementById('rc-nowHoldDays').value);
-  const listRate = parseFloat(document.getElementById('rc-listRate').value);
-  const buyPrice = parseFloat(document.getElementById('rc-buyPrice').value);
-  const planHoldDays = parseFloat(document.getElementById('rc-planHoldDays').value);
+function calcTransfer() {
+  const faceValue = parseFloat(document.getElementById('tr-faceValue').value);
+  const cdRate = parseFloat(document.getElementById('tr-cdRate').value);
+  const buyPrice = parseFloat(document.getElementById('tr-buyPrice').value);
+  const nowHoldDays = parseFloat(document.getElementById('tr-nowHoldDays').value);
+  const planHoldDays = parseFloat(document.getElementById('tr-planHoldDays').value) || 0;
+  const transferPriceInput = document.getElementById('tr-transferPrice').value;
+  const listRateInput = document.getElementById('tr-listRate').value;
 
-  if ([faceValue, cdRate, nowHoldDays, listRate, buyPrice, planHoldDays].some(v => isNaN(v) || v < 0)) {
-    showToast('请检查所有输入');
+  if ([faceValue, cdRate, buyPrice, nowHoldDays].some(v => isNaN(v) || v < 0)) {
+    showToast('请检查存单信息');
     return;
   }
-  if (nowHoldDays + planHoldDays >= 365 * 3) {
+  if (nowHoldDays + planHoldDays >= 365 * 3 + 1) {
     showToast('持有天数总和不能超过3年');
     return;
   }
+  if (transferPriceInput === '' && listRateInput === '') {
+    showToast('请至少填写转让报价或市场利率其中一项');
+    return;
+  }
 
-  // 核心公式
-  const remainDays = 365 * 3 - nowHoldDays - planHoldDays + 1;
-  const listRateDec = listRate / 100;
   const cdRateDec = cdRate / 100;
-  const transferPrice = (faceValue * (cdRateDec * 3 + 1)) / (listRateDec * remainDays / 365 + 1);
-  const convertRate = buyPrice !== 0 && planHoldDays !== 0
-    ? ((transferPrice - buyPrice) / buyPrice * 365 / planHoldDays) * 100
-    : 0;
-
-  // 已产生利息
+  const totalDays = 365 * 3 + 1; // 3年期通常跨越一个闰年，实际约1096天
+  const remainDays = totalDays - nowHoldDays - planHoldDays;
+  const maturityTotal = faceValue * (cdRateDec * 3 + 1); // 到期本息和
   const accruedInterest = faceValue * cdRateDec * nowHoldDays / 365;
-  // 持有期收益
-  const holdIncome = transferPrice - buyPrice;
-  // 总收益（如果original持有人）
-  const totalIncome = transferPrice - buyPrice + accruedInterest;
+
+  // 标记用户输入了哪些
+  const hasTransferPrice = transferPriceInput !== '';
+  const hasListRate = listRateInput !== '';
+
+  let transferPrice = 0;
+  let buyerRate = 0;      // 转入方折算利率
+  let sellerRate = 0;     // 转让方折算利率
+  let premium = 0;        // 转让溢价
+  let impliedListRate = 0; // 反推的市场利率
+
+  // 确定收益率计算用的持有期：有计划持有天数就用计划持有期，否则用已持有期
+  const rateHoldDays = planHoldDays > 0 ? planHoldDays : nowHoldDays;
+
+  if (hasTransferPrice) {
+    transferPrice = parseFloat(transferPriceInput);
+    // 反推转入方折算利率
+    if (transferPrice > 0 && remainDays > 0) {
+      buyerRate = ((maturityTotal - transferPrice) / transferPrice * 365 / remainDays) * 100;
+    }
+    // 反推隐含市场利率（使公式成立的挂牌利率）
+    if (remainDays > 0) {
+      impliedListRate = ((maturityTotal / transferPrice - 1) * 365 / remainDays) * 100;
+    }
+    premium = transferPrice - buyPrice;
+    sellerRate = rateHoldDays > 0 ? (premium / buyPrice * 365 / rateHoldDays) * 100 : 0;
+  }
+
+  let recommendedPrice = 0;
+  if (hasListRate) {
+    const listRate = parseFloat(listRateInput);
+    const listRateDec = listRate / 100;
+    recommendedPrice = maturityTotal / (listRateDec * remainDays / 365 + 1);
+    // 如果用户没有输入转让报价，用推荐价计算
+    if (!hasTransferPrice) {
+      transferPrice = recommendedPrice;
+      if (transferPrice > 0 && remainDays > 0) {
+        buyerRate = ((maturityTotal - transferPrice) / transferPrice * 365 / remainDays) * 100;
+      }
+      premium = transferPrice - buyPrice;
+      sellerRate = rateHoldDays > 0 ? (premium / buyPrice * 365 / rateHoldDays) * 100 : 0;
+    }
+  }
 
   // 展示结果
-  const summaryEl = document.getElementById('rc-summary');
-  summaryEl.innerHTML = `
-    <div class="big-label">预计转让价格</div>
-    <div class="big-number">¥${fmtMoney(transferPrice)}</div>
-    <div class="big-desc">您的持有期折算年化收益率约 ${convertRate.toFixed(2)}%</div>
-  `;
+  const summaryEl = document.getElementById('tr-summary');
+  let summaryHtml = '';
+  if (hasTransferPrice) {
+    summaryHtml = `
+      <div class="big-label">转让报价分析</div>
+      <div class="big-number">¥${fmtMoney(transferPrice)}</div>
+      <div class="big-desc">再持${Math.round(planHoldDays)}天后转让 · 下家折算利率 ${buyerRate.toFixed(4)}%</div>
+    `;
+  } else {
+    summaryHtml = `
+      <div class="big-label">推荐转让价格</div>
+      <div class="big-number">¥${fmtMoney(recommendedPrice)}</div>
+      <div class="big-desc">再持${Math.round(planHoldDays)}天后转让 · 下家折算利率 ${buyerRate.toFixed(4)}%</div>
+    `;
+  }
+  summaryEl.innerHTML = summaryHtml;
 
-  const resultsEl = document.getElementById('rc-results');
-  resultsEl.innerHTML = `
+  // 人话解释
+  const explainText = premium >= 0
+    ? `这张存单票面利率${cdRate}%${cdRate > (listRateInput ? parseFloat(listRateInput) : 0) ? '高于' : '接近'}当前市场参考利率，转让时有机会以溢价成交，收益主要来自转让价与买入成本的差额。`
+    : `当前市场参考利率已接近或高于存单票面利率，转让时可能需要折价出售，建议结合客户流动性需求综合判断。`;
+
+  const resultsEl = document.getElementById('tr-results');
+  let resultsHtml = `
+    <div class="result-card" style="background:#fff8ed;border-color:#f2d7a7;color:#5d3a00;">
+      <span class="result-card-label" style="color:#9a5b00;">通俗理解</span>
+      <span class="result-card-value" style="font-size:14px;font-weight:500;line-height:1.6;">${explainText}</span>
+    </div>
     <div class="result-card">
       <span class="result-card-label">存单面值</span>
       <span class="result-card-value">¥${fmtMoney(faceValue)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-card-label">存单利率</span>
+      <span class="result-card-value">${cdRate}%</span>
+    </div>
+    <div class="result-card">
+      <span class="result-card-label">买入成本</span>
+      <span class="result-card-value">¥${fmtMoney(buyPrice)}</span>
     </div>
     <div class="result-card">
       <span class="result-card-label">已持有天数</span>
@@ -1531,8 +1568,16 @@ function calcRateCut() {
       <span class="result-card-value positive">+¥${fmtMoney(accruedInterest)}</span>
     </div>
     <div class="result-card highlight">
-      <span class="result-card-label">转让溢价/折价</span>
-      <span class="result-card-value ${holdIncome >= 0 ? 'positive' : 'negative'}">${holdIncome >= 0 ? '+' : ''}¥${fmtMoney(holdIncome)}</span>
+      <span class="result-card-label">转让溢价 / 折价</span>
+      <span class="result-card-value ${premium >= 0 ? 'positive' : 'negative'}">${premium >= 0 ? '+' : ''}¥${fmtMoney(premium)}</span>
+    </div>
+    <div class="result-card">
+      <span class="result-card-label">转让方折算年化利率（${planHoldDays > 0 ? '计划持有期' : '已持有期'}）</span>
+      <span class="result-card-value">${sellerRate.toFixed(4)}%</span>
+    </div>
+    <div class="result-card">
+      <span class="result-card-label">转入方折算年化利率</span>
+      <span class="result-card-value">${buyerRate.toFixed(4)}%</span>
     </div>
     <div class="result-card">
       <span class="result-card-label">剩余期限（转让后）</span>
@@ -1540,39 +1585,57 @@ function calcRateCut() {
     </div>
   `;
 
-  // 对比图
-  const maxVal = Math.max(buyPrice, transferPrice, faceValue);
-  const chartEl = document.getElementById('rc-chart');
-  chartEl.innerHTML = `
-    <div class="chart-row">
-      <div class="chart-label">买入价</div>
-      <div class="chart-bar-wrap">
-        <div class="chart-bar bar-a" style="width:${(buyPrice/maxVal*100).toFixed(1)}%">¥${fmtMoney(buyPrice)}</div>
+  if (hasTransferPrice && impliedListRate > 0) {
+    resultsHtml += `
+      <div class="result-card">
+        <span class="result-card-label">对应市场挂牌利率（反推）</span>
+        <span class="result-card-value">${impliedListRate.toFixed(4)}%</span>
       </div>
-    </div>
+    `;
+  }
+  if (hasListRate) {
+    resultsHtml += `
+      <div class="result-card">
+        <span class="result-card-label">基于市场利率的推荐转让价</span>
+        <span class="result-card-value">¥${fmtMoney(recommendedPrice)}</span>
+      </div>
+    `;
+  }
+  resultsEl.innerHTML = resultsHtml;
+
+  // 对比图
+  const maxVal = Math.max(faceValue, transferPrice, maturityTotal);
+  const chartEl = document.getElementById('tr-chart');
+  chartEl.innerHTML = `
+    <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">金额对比</div>
     <div class="chart-row">
       <div class="chart-label">存单面值</div>
       <div class="chart-bar-wrap">
-        <div class="chart-bar bar-b" style="width:${(faceValue/maxVal*100).toFixed(1)}%">¥${fmtMoney(faceValue)}</div>
+        <div class="chart-bar bar-a" style="width:${(faceValue/maxVal*100).toFixed(1)}%">¥${fmtMoney(faceValue)}</div>
       </div>
     </div>
     <div class="chart-row">
-      <div class="chart-label">转让价格</div>
+      <div class="chart-label">转让报价</div>
       <div class="chart-bar-wrap">
-        <div class="chart-bar bar-c" style="width:${(transferPrice/maxVal*100).toFixed(1)}%">¥${fmtMoney(transferPrice)}</div>
+        <div class="chart-bar bar-b" style="width:${(transferPrice/maxVal*100).toFixed(1)}%">¥${fmtMoney(transferPrice)}</div>
+      </div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-label">到期本息和</div>
+      <div class="chart-bar-wrap">
+        <div class="chart-bar bar-c" style="width:${(maturityTotal/maxVal*100).toFixed(1)}%">¥${fmtMoney(maturityTotal)}</div>
       </div>
     </div>
   `;
 
-  // 沟通建议生成
-  const isPremium = holdIncome > 0;
-  const scriptEl = document.getElementById('rc-script');
-  scriptEl.textContent = generateRateCutScript({
-    faceValue, cdRate, nowHoldDays, listRate, buyPrice, planHoldDays,
-    transferPrice, convertRate, accruedInterest, holdIncome, isPremium, remainDays
+  const scriptEl = document.getElementById('tr-script');
+  scriptEl.textContent = generateTransferScript({
+    faceValue, cdRate, buyPrice, nowHoldDays, planHoldDays, transferPrice, premium, sellerRate, buyerRate,
+    accruedInterest, remainDays, hasTransferPrice, hasListRate, recommendedPrice, impliedListRate,
+    listRateInput: listRateInput
   });
 
-  setStep('rateCut', 4);
+  setStep('transfer', 3);
   showToast('计算完成！');
 }
 
@@ -1584,7 +1647,6 @@ function calcHoliday() {
   const cdRate = parseFloat(document.getElementById('hl-cdRate').value);
   const days = parseFloat(document.getElementById('hl-days').value);
   const compareRate = parseFloat(document.getElementById('hl-compareRate').value) || 0.25;
-  const holidayName = state.holiday.selectedHoliday?.name || '假期';
 
   if ([amount, cdRate, days].some(v => isNaN(v) || v <= 0)) {
     showToast('请检查所有输入');
@@ -1594,18 +1656,14 @@ function calcHoliday() {
   const cdRateDec = cdRate / 100;
   const compareRateDec = compareRate / 100;
 
-  // 假期收益
   const cdIncome = amount * cdRateDec * days / 365;
   const compareIncome = amount * compareRateDec * days / 365;
   const extraIncome = cdIncome - compareIncome;
 
-  // 日均提升（假设月末/季末时点）
-  const dailyBoost = amount;
-
   const summaryEl = document.getElementById('hl-summary');
   summaryEl.innerHTML = `
-    <div class="big-label">${holidayName} · ${Math.round(days)}天</div>
-    <div class="big-number">+¥${fmtMoney(extraIncome)}</div>
+    <div class="big-label">假期 ${Math.round(days)} 天</div>
+    <div class="big-number">¥${fmtMoney(extraIncome)}</div>
     <div class="big-desc">与${compareRate}%活期/货币基金的收益差额</div>
   `;
 
@@ -1657,7 +1715,7 @@ function calcHoliday() {
 
   const scriptEl = document.getElementById('hl-script');
   scriptEl.textContent = generateHolidayScript({
-    holidayName, days, amount, cdRate, compareRate, cdIncome, compareIncome, extraIncome, dailyBoost
+    days, amount, cdRate, compareRate, cdIncome, compareIncome, extraIncome
   });
 
   setStep('holiday', 3);
@@ -1683,26 +1741,20 @@ function calcEarly() {
   const cdRateDec = cdRate / 100;
   const listRateDec = listRate / 100;
   const demandRateDec = demandRate / 100;
-  const remainDays = 365 * 3 - nowHoldDays + 1;
+  const remainDays = 365 * 3 + 1 - nowHoldDays;
 
   // 方案A：提前支取
   const demandInterest = faceValue * demandRateDec * nowHoldDays / 365;
-  const demandTotal = buyPrice + demandInterest; // 实际上提前支取是拿面值+活期利息，但如果是二手买家要考虑买入价
-  // 简化：original持有人提前支取 = faceValue + 活期利息；二手买家 = buyPrice对应比例（复杂，按original持有人逻辑）
-  // 这里假设客户是original持有人或简化计算
   const demandGet = faceValue + demandInterest;
-  const demandLoss = faceValue * cdRateDec * nowHoldDays / 365 - demandInterest;
+  const accruedInterest = faceValue * cdRateDec * nowHoldDays / 365;
+  const demandLoss = accruedInterest - demandInterest;
 
   // 方案B：转让卖出
   const transferPrice = (faceValue * (cdRateDec * 3 + 1)) / (listRateDec * remainDays / 365 + 1);
   const transferIncome = transferPrice - buyPrice;
-  const transferTotal = transferPrice;
 
-  // 已产生利息（按原利率）
-  const accruedInterest = faceValue * cdRateDec * nowHoldDays / 365;
-
-  const better = transferTotal > demandGet ? 'transfer' : 'demand';
-  const diff = Math.abs(transferTotal - demandGet);
+  const better = transferPrice > demandGet ? 'transfer' : 'demand';
+  const diff = Math.abs(transferPrice - demandGet);
 
   const summaryEl = document.getElementById('ew-summary');
   summaryEl.innerHTML = `
@@ -1774,87 +1826,110 @@ function calcEarly() {
 // ========================
 // 沟通建议生成
 // ========================
-function generateRateCutScript(data) {
+function generateTransferScript(data) {
   const {
-    faceValue, cdRate, nowHoldDays, listRate, buyPrice, planHoldDays,
-    transferPrice, convertRate, accruedInterest, holdIncome, isPremium, remainDays
+    faceValue, cdRate, buyPrice, nowHoldDays, planHoldDays, transferPrice, premium, sellerRate, buyerRate,
+    accruedInterest, remainDays, hasTransferPrice, hasListRate, recommendedPrice, impliedListRate, listRateInput
   } = data;
 
-  return `【降息转让 · 客户沟通参考】
+  const holdLabel = planHoldDays > 0 ? `计划再持有${Math.round(planHoldDays)}天` : `已持有${Math.round(nowHoldDays)}天`;
+  const costDiff = buyPrice - faceValue;
+  const costDiffText = Math.abs(costDiff) < 0.01 ? '' : `（买入成本${costDiff > 0 ? '高于' : '低于'}面值约${fmtMoney(Math.abs(costDiff))}元）`;
 
-"张总/李姐，您看啊，央行又降息了，现在新发行的大额存单利率已经降到${listRate}%了。
+  let analysisPart = '';
+  if (hasTransferPrice && hasListRate) {
+    const diff = transferPrice - recommendedPrice;
+    analysisPart = `
+· 客户提出的转让报价为${fmtMoney(transferPrice)}元
+· 基于当前市场利率${listRateInput}%计算，推荐转让价约${fmtMoney(recommendedPrice)}元
+· 客户报价${diff >= 0 ? '高于' : '低于'}推荐价约${fmtMoney(Math.abs(diff))}元
+· 对应市场挂牌利率约${impliedListRate.toFixed(4)}%
+`;
+  } else if (hasTransferPrice) {
+    analysisPart = `
+· 客户提出的转让报价为${fmtMoney(transferPrice)}元
+· 对应市场挂牌利率约${impliedListRate.toFixed(4)}%
+· 下家接盘后的折算年化约${buyerRate.toFixed(4)}%
+`;
+  } else {
+    analysisPart = `
+· 基于当前市场利率${listRateInput}%计算，推荐转让价约${fmtMoney(recommendedPrice)}元
+· 下家接盘后的折算年化约${buyerRate.toFixed(4)}%
+`;
+  }
 
-但您手里这张${cdRate}%的存单，因为是之前买的，利率高啊，现在市场上这种'老存单'可值钱了。
+  return `【存单转让价差分析 · 客户沟通参考】
 
-我帮您算了一下：
-· 您的存单面值是${fmtMoney(faceValue)}元
-· 已经持有了${Math.round(nowHoldDays)}天，已经产生了${fmtMoney(accruedInterest)}元的利息
-· 如果现在就转让，预计能卖到${fmtMoney(transferPrice)}元
-· 您这段时间的实际年化收益大约是${convertRate.toFixed(2)}%
+（以下为客户经理内部学习参考，不构成任何投资承诺或收益保证，具体以产品协议及银行实际挂牌利率为准。）
 
-${isPremium ? `关键就在这：因为市场利率降了，您的老存单有${fmtMoney(holdIncome)}元的溢价空间。` : '当前市场利率和您的存单利率接近，转让主要以流动性需求为主。'}
+"张总/李姐，我帮您梳理了一下这张存单转让的数据：
 
-简单讲：降息对您反而是好事，高息存单更抢手了。您要是近期有资金安排，转让出去比提前支取划算得多。"
+· 存单面值${fmtMoney(faceValue)}元，约定利率${cdRate}%
+· 买入成本${fmtMoney(buyPrice)}元${costDiffText}
+· 已持有${Math.round(nowHoldDays)}天，按约定利率已产生约${fmtMoney(accruedInterest)}元利息
+· ${holdLabel}后转让，预计溢价/折价${premium >= 0 ? '+' : ''}${fmtMoney(premium)}元
+· 折算年化约${sellerRate.toFixed(4)}%
+${analysisPart}
 
-【关键卖点】
-1. 央行降息 → 老存单更值钱（稀缺性）
-2. 转让价格高于面值（价差空间）
-3. 持有期折算利率约 ${convertRate.toFixed(2)}%（高于当前市场利率）`;
+【参考要点】
+1. 大额存单转让需在银行转让区成交，最终成交价格受市场供需影响
+2. 下家接盘后的收益率与市场新发行存单利率密切相关
+3. 如急需资金，转让成交存在不确定性，建议提前评估流动性需求`;
 }
 
 function generateHolidayScript(data) {
-  const { holidayName, days, amount, cdRate, compareRate, cdIncome, compareIncome, extraIncome, dailyBoost } = data;
+  const { days, amount, cdRate, compareRate, cdIncome, compareIncome, extraIncome } = data;
 
   return `【假日资金泊车 · 客户沟通参考】
 
-"张总/李姐，马上${holidayName}了，跟您说个不少客户都在用的'假日泊车'小技巧。
+（以下为客户经理内部学习参考，不构成任何投资承诺或收益保证，具体以产品协议及银行实际执行利率为准。）
 
-您知道假期股票休市、大部分理财也不确认份额，钱躺在账户里那几天是白放的，基本没利息。
+"张总/李姐，关于假期资金安排，我帮您做了一个简单的收益对比参考：
 
-但大额存单不一样——它是按日计息的！假期每一天都在给您生钱。
+· 若将${fmtMoney(amount)}元配置在${cdRate}%的大额存单中
+· 假期共${Math.round(days)}天
+· 预计产生利息约${fmtMoney(cdIncome)}元
+· 若放活期或货币基金（参考利率${compareRate}%），预计收益约${fmtMoney(compareIncome)}元
+· 两者收益差额约${fmtMoney(extraIncome)}元
 
-我帮您算了一笔账：
-· 如果您有${fmtMoney(amount)}元闲钱
-· ${holidayName}共${Math.round(days)}天
-· 买咱们${cdRate}%的大额存单，假期能挣${fmtMoney(cdIncome)}元
-· 要是放活期或者货币基金（约${compareRate}%），只能挣${fmtMoney(compareIncome)}元
-· 收益差额为${fmtMoney(extraIncome)}元
+节后如需使用资金，存单可通过转让区卖出回笼，资金到账时间视转让区成交情况而定。
 
-${Math.round(days)}天收益差额为${fmtMoney(extraIncome)}，节后存单可通过转让区卖出回笼资金。
-
-等于说假期您的钱在'加班'，别人在放假。"`;
+【参考要点】
+1. 大额存单假期按日计息，不受股市休市影响
+2. 节后资金回笼需通过转让区成交，存在流动性不确定性
+3. 收益对比仅为参考估算，实际收益以银行计息规则为准`;
 }
 
 function generateEarlyScript(data) {
   const { faceValue, cdRate, nowHoldDays, listRate, demandRate, demandGet, demandLoss, transferPrice, transferIncome, better, diff, accruedInterest } = data;
 
   const recommend = better === 'transfer'
-    ? `转让卖出预计比提前支取多拿回${fmtMoney(diff)}元，但最终能否成交取决于转让区流动性，资金急用当天必须到账的，提前支取更稳妥。`
+    ? `转让卖出预计比提前支取多拿回${fmtMoney(diff)}元，但最终能否成交取决于转让区流动性及市场利率走势，资金急用当天必须到账的，提前支取更稳妥。`
     : `当前市场利率与存单利率差距较小，转让卖出与提前支取的收益差距不大，可根据客户资金急用程度和转让区成交情况综合判断。`;
 
   return `【提前用款方案对比 · 客户沟通参考】
 
-"张总/李姐，您急用钱的心情我理解。我帮您把两种方案都算了一下，咱们看哪个更划算：
+（以下为客户经理内部学习参考，不构成任何投资承诺或收益保证，具体以产品协议及银行实际执行利率为准。）
+
+"张总/李姐，我帮您梳理了两种资金回笼方式的参考数据：
 
 【方案一：提前支取】
-· 银行按活期利率${demandRate}%给您结算
-· 您已经持有了${Math.round(nowHoldDays)}天，按原利率应该产生${fmtMoney(accruedInterest)}元利息
-· 但提前支取只能拿到${fmtMoney(demandGet)}元
-· 相当于利息损失了${fmtMoney(demandLoss)}元
+· 银行按活期利率${demandRate}%结算
+· 已持有${Math.round(nowHoldDays)}天，按原利率约产生${fmtMoney(accruedInterest)}元利息
+· 提前支取预计可拿到${fmtMoney(demandGet)}元
+· 与原利率相比，利息差额约${fmtMoney(demandLoss)}元
 
 【方案二：转让卖出】
-· 把存单挂到转让区，让下家接盘
-· 当前市场新存单利率是${listRate}%
+· 将存单挂在转让区，由下家接盘
+· 参考当前市场新存单利率${listRate}%
 · 预计转让价格约${fmtMoney(transferPrice)}元
-· 转让收益约${fmtMoney(transferIncome)}元
+· 转让价差收益约${fmtMoney(transferIncome)}元
 
-【结论】
+【参考分析】
 ${recommend}
 
-转让的好处是：您不用损失利息，下家买走之后您立刻拿到钱。而且现在转让都是线上操作，几分钟就能挂单。"
-
-【注意提醒客户】
-转让需要有人接盘，如果市场流动性不好可能需要等待。如果资金当天必须到账，提前支取是更稳妥的选择。`;
+【风险提示】
+大额存单转让需在银行转让区成交，最终能否转让及成交价格受市场供需影响，存在无法及时成交或成交价格不及预期的可能。如资金有明确到账时限要求，建议优先考虑提前支取。`;
 }
 
 // ========================
@@ -1880,11 +1955,13 @@ function copyScript(id) {
 // ========================
 const helpData = {
   faceValue: { title: '存单面值', body: '存单到期时银行返还的本金金额。大额存单一般20万元起购，常见面值有20万、30万、50万、100万等。' },
-  cdRate: { title: '存单利率', body: '存单发行时约定的年化利率。例如2.65%表示每年按本金的2.65%计息。老存单通常比新存单利率高。' },
-  holdDays: { title: '已持有天数', body: '从存单生效日（起息日）到今天一共经过了多少天。可以在手机银行"我的存单"里查看起息日。' },
+  cdRate: { title: '存单利率', body: '存单发行时约定的年化利率。例如1.75%表示每年按本金的1.75%计息。老存单通常比新存单利率高。' },
+  buyPrice: { title: '买入价格', body: '客户实际花多少钱买到这张存单的。original 持有人买入价就是面值；二手买家在转让区买入时，价格可能高于或低于面值。' },
+  holdDays: { title: '已持有天数', body: '从存单生效日（起息日）到今天一共经过了多少天。可以在手机银行"我的存单"里查看起息日。也可以直接填写"剩余期限"，系统会自动换算。' },
+  remainDays: { title: '剩余期限', body: '从现在到存单到期日还剩多少天。二手买家通常更清楚这个数，可以直接填写，系统会自动算出已持有天数。' },
+  planHoldDays: { title: '计划再持有天数', body: '客户打算继续持有多少天后再转让。0表示立刻转让，持有时间越长，转让时剩余期限越短。' },
   listRate: { title: '挂牌利率', body: '当前市场上新发行同期限大额存单的利率。央行降息后，挂牌利率会下调，导致老存单（高利率）变得更有价值。' },
-  buyPrice: { title: '购买价格', body: '您买入这张存单时实际花了多少钱。如果您是original持有人（在银行首发时购买），购买价格=存单面值。如果您是从转让区买别人的二手存单，购买价格可能高于或低于面值。' },
-  planHoldDays: { title: '计划持有天数', body: '您打算继续持有这张存单多长时间后再转让。持有时间越长，累积的利息越多，但市场利率变化的不确定性也越大。' }
+  transferPrice: { title: '转让报价', body: '客户在转让区挂单的价格。如果高于面值就是溢价，低于面值就是折价。银行APP转让区可以看到当前挂牌价格。' }
 };
 
 function showHelp(key) {
@@ -1923,7 +2000,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     input.addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
-        // 找到当前活跃的wizard和step，尝试下一步
         const panel = this.closest('.step-panel');
         if (!panel) return;
         const wizard = panel.closest('.wizard');
